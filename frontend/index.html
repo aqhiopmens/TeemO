@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TeemO — Book Recommendations</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>TeemO</h1>
+    <p>AI-powered book preference analysis &amp; recommendations</p>
+  </header>
+
+  <main>
+    <section id="add-book">
+      <h2>Add a Book You've Read</h2>
+      <form id="book-form">
+        <input type="text" id="title" placeholder="Book Title" required />
+        <input type="text" id="author" placeholder="Author" required />
+        <input type="text" id="genre" placeholder="Genre (e.g. Fiction, Sci-Fi)" required />
+        <label>
+          Rating (1–5):
+          <input type="number" id="rating" min="1" max="5" required />
+        </label>
+        <button type="submit">Add Book</button>
+      </form>
+    </section>
+
+    <section id="search-section">
+      <h2>Search Your Books</h2>
+      <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Search by title..." />
+        <button id="search-btn">Search</button>
+      </div>
+      <div id="search-results"></div>
+    </section>
+
+    <section id="book-list-section">
+      <h2>Your Reading List</h2>
+      <div id="book-list"></div>
+    </section>
+
+    <section id="recommendations-section">
+      <h2>AI Recommendations</h2>
+      <button id="get-recs-btn">Get Recommendations</button>
+      <div id="recommendations"></div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
