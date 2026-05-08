@@ -1,22 +1,83 @@
 # TeemO
-2026-1 Algorithm Project
+2026-1 Algorithm Project — AI-based Book Preference Analysis & Recommendation
+
+## Overview
+
+Users input books they have read along with ratings (1–5).  
+The backend analyzes reading preferences using classic algorithms, then calls the  
+Upstage Solar LLM to generate personalized book recommendations.
+
+## Project Structure
+
+```
+TeemO/
+├── backend/
+│   ├── app.py                  # Flask REST API
+│   ├── algorithms/
+│   │   ├── merge_sort.py       # Sort books by rating
+│   │   ├── hashing.py          # Genre-keyed hash table
+│   │   ├── greedy.py           # Preference score weighting
+│   │   └── kmp.py              # Title search (KMP)
+│   ├── llm/
+│   │   └── solar.py            # Upstage Solar API client
+│   └── requirements.txt
+├── frontend/
+│   ├── index.html
+│   ├── style.css
+│   └── script.js
+├── .env                        # (not committed) UPSTAGE_API_KEY=...
+└── README.md
+```
+
+## Setup
+
+```bash
+# 1. Create and activate a virtual environment
+python -m venv venv
+venv\Scripts\activate        # Windows
+# source venv/bin/activate   # macOS / Linux
+
+# 2. Install dependencies
+pip install -r backend/requirements.txt
+
+# 3. Create .env in the project root
+echo UPSTAGE_API_KEY=your_key_here > .env
+
+# 4. Run the backend
+cd backend
+python app.py
+```
+
+Open `frontend/index.html` in a browser (or serve it with any static server).
+
+## API Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/books` | List all books sorted by rating |
+| POST | `/api/books` | Add a book `{title, author, genre, rating}` |
+| GET | `/api/search?q=<query>` | Search books by title (KMP) |
+| GET | `/api/recommendations` | Get Solar LLM recommendations |
 
 ## Algorithm Concepts Applied
 
-### 1. Merge Sort (Week 03)
-- Purpose: Sort detected threats by severity score in descending order
-  before passing results to the Solar LLM
-- Method: Divide & Conquer based comparison sort
-- Each traffic entry is assigned a threat score based on its label
-  (e.g., BENIGN=0, PortScan=3, DoS=7, DDoS=10)
-- Merge Sort is applied to rank threats from highest to lowest severity
-- Time complexity: O(n log n) guaranteed in all cases
-- Chosen over Quick Sort due to stable sorting and no worst-case degradation
+### 1. Merge Sort (`algorithms/merge_sort.py`)
+- **Purpose:** Sort the user's book list by rating in descending order before analysis
+- **Method:** Divide & Conquer — recursively splits the list, merges in sorted order
+- **Complexity:** O(n log n) guaranteed; stable sort preserves insertion order for equal ratings
 
-### 2. Hash Table with Separate Chaining (Week 10)
-- Purpose: Count and detect suspicious source IPs in O(1) average time
-- Hash function: h(k) = k mod m (Division Method)
-- Collision resolution: Separate Chaining (linked list per slot)
-- Each source IP is converted to an integer key and inserted into the hash table
-- IPs with request counts exceeding a threshold are flagged as suspicious
-- Time complexity: O(1) average for insert and search
+### 2. Hash Table with Separate Chaining (`algorithms/hashing.py`)
+- **Purpose:** Group books by genre and compute top preferred genres in O(1) average time
+- **Hash function:** `sum(ord(c) for c in genre) % table_size`
+- **Collision resolution:** Separate chaining (list of entries per slot)
+- **Complexity:** O(1) average for insert and lookup
+
+### 3. Greedy Preference Scoring (`algorithms/greedy.py`)
+- **Purpose:** Assign a normalized preference weight to each genre
+- **Method:** Greedily accumulates rating × rank-bonus per genre, then normalizes
+- **Complexity:** O(n) — single pass over the sorted book list
+
+### 4. KMP String Search (`algorithms/kmp.py`)
+- **Purpose:** Efficient substring title search across the book list
+- **Method:** Knuth–Morris–Pratt with LPS (Longest Proper Prefix-Suffix) table
+- **Complexity:** O(n + m) where n = text length, m = pattern length
