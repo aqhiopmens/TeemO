@@ -50,6 +50,15 @@ python app.py
 
 Open `frontend/index.html` in a browser (or serve it with any static server).
 
+## Running Tests
+
+Unit tests for the algorithm modules use the Python standard library `unittest` framework — no extra dependencies required.
+
+```bash
+cd backend
+python -m unittest discover -s tests
+```
+
 ## API Endpoints
 
 | Method | Path | Description |
