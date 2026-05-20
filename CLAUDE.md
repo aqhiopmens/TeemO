@@ -52,8 +52,9 @@ We work in **two parallel tracks** to minimize merge conflicts and keep concerns
 #### Track 1: App (Frontend + Backend combined)
 - **Branch prefix**: `feature/app-*`
 - **Owners**: 김강민 (BE) + 서은빈 (FE)
+- **Working style**: Both members push directly to the **same** `feature/app-*` branch (no separate FE/BE branches). Always run `git pull --rebase origin <branch>` before each push to avoid conflicts and accidental force pushes.
 - **Rationale**: UI and API changes are tightly coupled — pairing them in one branch keeps integration smooth
-- **File ownership**: BE owns `backend/` (excluding `backend/llm/`), FE owns `frontend/`
+- **File ownership**: BE owns `backend/` (excluding `backend/llm/`), FE owns `frontend/`. Don't edit the other person's files in the same session without telling them in chat.
 - **Example branches**:
   - `feature/app-add-validation`
   - `feature/app-search-ui-polish`
