@@ -51,22 +51,24 @@ claude --version
 
 ## STEP 3 — 공유 Claude 계정 로그인
 
-교수님이 주신 Claude Max 계정을 4명이 공유합니다. 단톡에서 다음 3가지를 받으세요:
+교수님이 주신 Claude Max 계정을 4명이 공유합니다. 이 계정은 **Google 계정**과 연동돼 있어요. 단톡에서 다음 2가지를 받으세요:
 
-1. **이메일**
+1. **이메일** (Google 계정 주소)
 2. **비밀번호**
-3. **2FA secret** (Google Authenticator 또는 Authy 앱에 등록)
 
-> 비밀번호는 받은 즉시 본인 메모장에 옮기고 단톡에서는 지워주세요.
-> 2FA secret은 Authenticator 앱에 "Account name: TeemO Shared" 같은 이름으로 추가.
+> 비밀번호는 받은 즉시 본인 메모장으로 옮기고 단톡에선 지워주세요.
 
 로그인:
 ```bash
 claude
 ```
 - 브라우저가 자동으로 열림
-- 위 정보로 로그인 + 2FA 코드 입력
-- 한 번 로그인하면 본인 노트북에 저장 → 다음부터 자동
+- **"Continue with Google"** 클릭
+- 위 정보로 로그인
+- "Trust this device / 이 기기 신뢰" 체크박스 보이면 체크
+- 한 번 로그인하면 본인 노트북에 저장 → 다음부턴 자동
+
+> ⚠️ **처음 로그인 시 Google이 "새 기기에서 로그인" 알림을 보낼 수 있습니다.** 본인이 맞으니 안내에 따라 "Yes, it was me" 클릭하면 됩니다. 계정이 일시 잠기면 단톡에 "로그인 막혔어" 한마디 → owner가 풀어줄 수 있음.
 
 ---
 
@@ -145,7 +147,7 @@ git push -u origin feature/app-내작업이름
 | 증상 | 해결 |
 |---|---|
 | `claude` 명령어 못 찾음 | 새 터미널 창 열기 (PATH 갱신) |
-| 로그인 시 2FA 코드 안 맞음 | Authenticator 앱에 secret 다시 등록 |
+| Google 로그인 시 "수상한 활동" 차단 | 단톡에 알림 → owner가 myaccount.google.com에서 "Yes, it was me" 클릭 |
 | `git push` 거부됨 (permission denied) | collaborator 초대 수락 안 함 → STEP 1 마지막 확인 |
 | Claude가 프로젝트 컨텍스트 모름 | `CLAUDE.md`가 있는 폴더에서 `claude` 실행했는지 확인 |
 | 한국어 입력 깨짐 | Windows: `chcp 65001` 실행 |
