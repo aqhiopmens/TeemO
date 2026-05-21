@@ -121,6 +121,90 @@ We work in **two parallel tracks** to minimize merge conflicts and keep concerns
 - ✅ Solar API integration working end-to-end (verified on web)
 - ⏳ Next: 1–2 more algorithms (BST/DP/Graph), LLM quality testing, UI polish
 
+## Common Patterns (Templates)
+
+### Adding a new algorithm module
+1. Create `backend/algorithms/<name>.py` — pure functions / classes, **no Flask imports**
+2. Top of file: docstring describing purpose, method, and **time complexity**
+3. Create `backend/tests/test_<name>.py` mirroring existing test files (stdlib `unittest`, see `test_kmp.py` as reference)
+4. Wire into `backend/app.py` only if it serves a user-facing endpoint
+5. Update `README.md` "Algorithm Concepts Applied" section
+6. Run `cd backend && python -m unittest discover -s tests` — all green
+
+### Adding a new REST endpoint
+1. Add route in `backend/app.py` with explicit validation (mirror the `add_book` POST handler)
+2. Return `{'error': '...'}` with proper HTTP status on bad input (400, 404, etc.)
+3. Document in README's `## API Endpoints` table AND update the same table in `CLAUDE.md`
+4. If the endpoint changes existing response shape, **announce in team chat before merging** (frontend will break)
+5. Frontend code (`script.js`) calls it through the existing `apiFetch()` helper
+
+### Adding a frontend feature
+1. New section in `frontend/index.html` follows the `<section id="...">` + `<h2>` pattern
+2. Event handlers at bottom of `script.js`, always go through `apiFetch()`
+3. **Any user-input rendered into DOM MUST pass through `escapeHtml()`** — no exceptions
+4. CSS in `style.css`, reuse existing CSS variables (don't hardcode colors)
+5. Test by opening `frontend/index.html` in browser with backend running on `localhost:5000`
+
+### Adding/changing an LLM prompt (박병진)
+1. Versioned in `backend/llm/solar.py` (or new file under `backend/llm/`) with comment `# Prompt v2: <rationale>`
+2. Test against the 4 input cases (1 book / single genre / 5+ genres / extreme ratings)
+3. Include before/after example outputs in PR description
+4. If response shape changes (e.g., now returns JSON instead of markdown), coordinate with App track
+
+## Testing Conventions
+
+- **Framework**: stdlib `unittest` only — no pytest, no third-party deps
+- **Location**: `backend/tests/test_<module>.py`
+- **Per algorithm, cover at minimum**:
+  - Empty / single-element edge case
+  - Happy path (typical input)
+  - Invariants (e.g. "sort is stable", "scores sum to ~1.0")
+  - Boundary (smallest valid, largest practical)
+- **Naming**: `test_<behavior_in_snake_case>` — describe the assertion, not the function
+- **Run**: `cd backend && python -m unittest discover -s tests`
+- **Required before merging algorithm PRs**: all tests pass locally + author has added at least one test for any new function
+
+## Common Pitfalls
+
+| Pitfall | Prevention |
+|---|---|
+| Korean text shows as `???` in Windows terminal | Run `chcp 65001` once per shell, or use VS Code terminal |
+| Frontend can't reach backend (CORS error in console) | Verify `CORS(app)` is still present in `app.py` and backend is running on port 5000 |
+| `UPSTAGE_API_KEY not set` error on `/api/recommendations` | `.env` must be in project root (not `backend/`); `load_dotenv()` walks up to find it |
+| Algorithm module accidentally imports Flask | Algorithms must be pure — move any Flask logic into `app.py` |
+| Two people push to same `feature/app-*` branch and one's commit disappears | Run `git pull --rebase origin <branch>` **before every push** |
+| LLM call hangs forever | `solar.py` should pass `timeout=30` to `requests.post` |
+| `.env` accidentally committed | Already gitignored. If a key leaks, rotate on Upstage immediately and force-push to remove from history |
+
+## Definition of Done
+
+A task is "done" when:
+
+| Task type | Done means |
+|---|---|
+| **New algorithm** | Module + docstring with complexity + tests (4+ cases) + README mention + all tests green |
+| **New API endpoint** | Route + input validation + README API table updated + manual curl test passes |
+| **Frontend feature** | UI works in browser + `escapeHtml()` on user input + no console errors |
+| **LLM prompt change** | Tested against the 4 input cases + before/after examples in PR description |
+| **Bug fix** | Failing test added that reproduces the bug + fix makes it pass |
+| **Refactor** | All existing tests still green + no behavior change + 1-line PR description explaining "why" |
+| **Docs** | A teammate could follow the new instructions cold without asking questions |
+
+**Universally required**:
+- PR description explains the "why" in 1–3 sentences
+- No new runtime dependencies without team agreement
+- Branch follows naming convention (`feature/app-*`, `feature/llm-*`, `docs/*`, `fix/*`)
+
+## Working with Ralph-style Loops
+
+When using `/loop` or autonomous iteration (e.g. "keep working until X"):
+
+- **Always include an explicit stop condition** — "stop when all tests pass", "stop when README updated", etc. Never open-ended.
+- **Scope the goal narrowly** — one feature per loop. Don't say "build the whole BST module + 5 endpoints + UI" in one shot.
+- **Reference this CLAUDE.md sections** in the goal — e.g. "follow the 'Adding a new algorithm module' pattern in CLAUDE.md"
+- **Heavy loops eat shared rate limit** — coordinate in team chat before kicking off
+- **Verify the result yourself** — read the diff, don't just trust "Claude said it's done"
+
 ## When in Doubt
 - **Code style questions**: Match existing patterns in the repo
 - **Architecture questions**: Keep it simple — this is a course project, not production
