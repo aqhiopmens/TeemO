@@ -11,12 +11,33 @@
 ## 필요한 것
 - 노트북 (Windows / Mac 모두 OK)
 - 인터넷
+- **VS Code** (수업에서 쓰는 그거. 없으면 https://code.visualstudio.com 에서 설치)
 - GitHub 계정 (없으면 STEP 1)
 - Claude 계정 정보 (단톡 별도 공지)
+
+## 각 STEP 어디서 하는지
+
+| STEP | 어디서 |
+|---|---|
+| STEP 1 — GitHub 가입 | 🌐 브라우저 |
+| STEP 2 — Claude Code 설치 | ⌨️ VS Code 터미널 |
+| STEP 3 — Claude 로그인 | ⌨️ VS Code 터미널 → 🌐 브라우저 (자동) → ⌨️ 터미널로 복귀 |
+| STEP 4 — 저장소 clone | ⌨️ VS Code 터미널 |
+| STEP 5 — 첫 실행 | ⌨️ VS Code 터미널 (Claude Code UI 열림) |
+
+### VS Code 터미널 여는 법
+1. VS Code 실행
+2. 메뉴 **Terminal → New Terminal**
+   - 또는 단축키: Windows/Linux `` Ctrl + ` ``  (백틱) / Mac `` Cmd + ` ``
+3. 화면 아래쪽에 터미널 창이 열림 → 여기에 명령어 입력
+
+> **Windows에서 셸이 PowerShell이 아니면**: 터미널 창 우측 상단 **`+` 옆 ▼** 클릭 → **PowerShell** 선택
 
 ---
 
 ## STEP 1 — GitHub 계정 만들기 (이미 있으면 STEP 2로)
+
+📍 **어디서**: 🌐 브라우저
 
 1. https://github.com/signup
 2. 이메일 (학교 메일 OK) / 비밀번호 / **username 신중히** (커밋에 본인 이름으로 표시됨)
@@ -26,6 +47,8 @@
 ---
 
 ## STEP 2 — Claude Code 설치
+
+📍 **어디서**: ⌨️ VS Code 터미널
 
 ### Windows (PowerShell)
 ```powershell
@@ -51,6 +74,8 @@ claude --version
 
 ## STEP 3 — 공유 Claude 계정 로그인
 
+📍 **어디서**: ⌨️ VS Code 터미널 → 🌐 브라우저 (자동으로 열림) → ⌨️ 터미널로 자동 복귀
+
 교수님이 주신 Claude Max 계정을 4명이 공유합니다. 이 계정은 **Google 계정**과 연동돼 있어요. 단톡에서 다음 2가지를 받으세요:
 
 1. **이메일** (Google 계정 주소)
@@ -74,7 +99,9 @@ claude
 
 ## STEP 4 — 저장소 받기
 
-원하는 폴더에서:
+📍 **어디서**: ⌨️ VS Code 터미널
+
+원하는 폴더에서 (예: `Documents` 안에):
 ```bash
 git clone https://github.com/aqhiopmens/TeemO.git
 cd TeemO
@@ -90,8 +117,12 @@ git config --global user.email "본인 이메일"
 
 ## STEP 5 — 첫 실행
 
+📍 **어디서**: ⌨️ VS Code 터미널 (실행 후 그 안에 Claude Code UI가 열림)
+
+VS Code에서 **File → Open Folder** 로 방금 clone한 `TeemO` 폴더 열기.
+그 다음 터미널 열고:
+
 ```bash
-cd TeemO
 claude
 ```
 
