@@ -1,0 +1,71 @@
+# 개인 컨텍스트 (CLAUDE.local.md.template)
+
+> **사용법**: 이 파일을 같은 폴더에 `CLAUDE.local.md`로 **복사**한 다음, 본인에 해당하는 섹션만 남기고 나머지 3개는 지우세요. `.gitignore`에 등록되어 있어 본인 노트북에만 남고 repo에는 안 올라갑니다.
+>
+> 복사 명령 (VS Code 터미널):
+> ```
+> cp CLAUDE.local.md.template CLAUDE.local.md   # Mac / Linux
+> copy CLAUDE.local.md.template CLAUDE.local.md # Windows
+> ```
+
+---
+
+## 김강민 (Backend Lead)
+
+- **이름**: 김강민
+- **GitHub**: (본인 username)
+- **역할**: Backend Lead, 알고리즘
+- **트랙**: App
+- **담당 폴더**: `backend/` (단, `backend/llm/`는 박병진)
+- **브랜치 prefix**: `feature/app-*`
+- **짝꿍**: 서은빈 (FE) — 같은 `feature/app-*` 브랜치 공유, push 전 `git pull --rebase` 필수
+
+### 작업 스타일 / 선호
+- (예: Python 타입 힌트 적극 사용)
+- (예: docstring에 시간복잡도 명시)
+
+---
+
+## 서은빈 (Frontend)
+
+- **이름**: 서은빈
+- **GitHub**: (본인 username)
+- **역할**: Frontend UI/UX
+- **트랙**: App
+- **담당 폴더**: `frontend/`
+- **브랜치 prefix**: `feature/app-*`
+- **짝꿍**: 김강민 (BE) — 같은 `feature/app-*` 브랜치 공유, push 전 `git pull --rebase` 필수
+
+### 작업 스타일 / 선호
+- (예: CSS 변수로 테마 통일)
+- (예: `escapeHtml()` 항상 사용 → XSS 방지)
+
+---
+
+## 박병진 (LLM / Prompt)
+
+- **이름**: 박병진
+- **GitHub**: (본인 username)
+- **역할**: LLM 연동, 프롬프트 엔지니어링
+- **트랙**: LLM (단독)
+- **담당 폴더**: `backend/llm/`
+- **브랜치 prefix**: `feature/llm-*`
+
+### 작업 스타일 / 선호
+- (예: 프롬프트 버전 v1/v2/v3 명시)
+- (예: 4가지 입력 케이스로 테스트 — 1권 / 단일장르 / 다양 / 극단평점)
+
+---
+
+## 오세준 (PM)
+
+- **이름**: 오세준
+- **GitHub**: (본인 username)
+- **역할**: PM — 일정, 문서, 회의, 발표 자료
+- **트랙**: 코드 트랙 없음 (필요 시 README/docs 수정)
+- **담당 폴더**: `README.md`, `docs/`, GitHub Issues
+- **브랜치 prefix**: `docs/*`
+
+### 작업 스타일 / 선호
+- (예: 발표 자료는 영어, 슬라이드는 16:9)
+- (예: 매주 월요일 회의록 작성)
