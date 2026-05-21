@@ -50,6 +50,8 @@
 
 📍 **어디서**: ⌨️ VS Code 터미널
 
+> **이미 설치돼 있으면 이 단계 스킵.** 확인하려면 터미널에서 `claude --version` 실행 → 버전 번호 나오면 OK, STEP 3으로.
+
 ### Windows (PowerShell)
 ```powershell
 irm https://claude.ai/install.ps1 | iex
@@ -82,6 +84,23 @@ claude --version
 2. **비밀번호**
 
 > 비밀번호는 받은 즉시 본인 메모장으로 옮기고 단톡에선 지워주세요.
+
+### 이미 본인 Claude 계정으로 로그인돼 있다면? (예: 박병진처럼 평소에 쓰던 사람)
+
+Claude Code 실행 후 슬래시 명령으로 계정 전환:
+```bash
+claude
+```
+Claude Code UI가 뜨면 그 안에 입력:
+```
+/login
+```
+→ 브라우저 열림 → 공유 계정으로 로그인 → 완료.
+
+> **본인 개인 계정 데이터는 안 사라집니다.** 학기 끝나고 `/login`으로 본인 계정 다시 선택하면 그대로 돌아옴.
+> 잘 안 되면 `/logout` 먼저 한 다음 `/login`.
+
+### 처음 Claude Code 쓰는 경우
 
 로그인:
 ```bash
@@ -178,6 +197,7 @@ git push -u origin feature/app-내작업이름
 | 증상 | 해결 |
 |---|---|
 | `claude` 명령어 못 찾음 | 새 터미널 창 열기 (PATH 갱신) |
+| 다른 Claude 계정으로 로그인돼 있음 | `claude` 실행 후 `/login` → 공유 계정으로 전환 |
 | Google 로그인 시 "수상한 활동" 차단 | 단톡에 알림 → owner가 myaccount.google.com에서 "Yes, it was me" 클릭 |
 | `git push` 거부됨 (permission denied) | collaborator 초대 수락 안 함 → STEP 1 마지막 확인 |
 | Claude가 프로젝트 컨텍스트 모름 | `CLAUDE.md`가 있는 폴더에서 `claude` 실행했는지 확인 |
