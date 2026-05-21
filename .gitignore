@@ -211,6 +211,7 @@ tempCodeRunnerFile.py
 
 # Claude Code
 .claude/
+CLAUDE.local.md
 
 # Marimo
 marimo/_static/

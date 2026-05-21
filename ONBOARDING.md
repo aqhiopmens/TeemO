@@ -23,7 +23,8 @@
 | STEP 2 — Claude Code 설치 | ⌨️ VS Code 터미널 |
 | STEP 3 — Claude 로그인 | ⌨️ VS Code 터미널 → 🌐 브라우저 (자동) → ⌨️ 터미널로 복귀 |
 | STEP 4 — 저장소 clone | ⌨️ VS Code 터미널 |
-| STEP 5 — 첫 실행 | ⌨️ VS Code 터미널 (Claude Code UI 열림) |
+| STEP 5 — 본인 정보(CLAUDE.local.md) 설정 | ⌨️ VS Code 터미널 + 파일 편집 |
+| STEP 6 — 첫 실행 | ⌨️ VS Code 터미널 (Claude Code UI 열림) |
 
 ### VS Code 터미널 여는 법
 1. VS Code 실행
@@ -134,23 +135,43 @@ git config --global user.email "본인 이메일"
 
 ---
 
-## STEP 5 — 첫 실행
+## STEP 5 — 본인 정보를 Claude에게 알려주기
+
+📍 **어디서**: ⌨️ VS Code 터미널
+
+Claude Code는 `CLAUDE.md` (프로젝트 공통) 외에 **`CLAUDE.local.md`** (개인용)도 자동으로 읽습니다. 이 파일은 `.gitignore`에 등록돼 있어 **본인 노트북에만 남고 다른 팀원과 충돌하지 않습니다**.
+
+```bash
+# Windows
+copy CLAUDE.local.md.template CLAUDE.local.md
+
+# Mac / Linux
+cp CLAUDE.local.md.template CLAUDE.local.md
+```
+
+복사 후 VS Code에서 `CLAUDE.local.md`를 열고 **본인 섹션만 남기고 나머지 3명 섹션은 지우세요**. 본인 GitHub username, 선호 작업 스타일 등도 채워넣으면 좋습니다.
+
+이 단계 안 하면 매번 Claude한테 "나 누구야"를 직접 알려줘야 합니다.
+
+---
+
+## STEP 6 — 첫 실행
 
 📍 **어디서**: ⌨️ VS Code 터미널 (실행 후 그 안에 Claude Code UI가 열림)
 
-VS Code에서 **File → Open Folder** 로 방금 clone한 `TeemO` 폴더 열기.
-그 다음 터미널 열고:
+VS Code에서 **File → Open Folder** 로 clone한 `TeemO` 폴더가 열려 있는지 확인.
+그 다음 터미널에서:
 
 ```bash
 claude
 ```
 
-Claude Code가 `CLAUDE.md`를 자동으로 읽어서 프로젝트 컨텍스트를 파악합니다.
+Claude Code가 `CLAUDE.md` (프로젝트) + `CLAUDE.local.md` (본인) 둘 다 자동으로 읽어들입니다.
 시험 삼아 이렇게 물어보세요:
 
 > "이 프로젝트가 뭐 하는 거고 내 역할이 뭐야?"
 
-본인 역할에 맞는 답이 나오면 셋업 성공 ✅
+본인 이름·역할이 정확히 나오면 셋업 성공 ✅
 
 ---
 
