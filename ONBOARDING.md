@@ -141,6 +141,27 @@ git config --global user.email "본인 이메일"
 
 Claude Code는 `CLAUDE.md` (프로젝트 공통) 외에 **`CLAUDE.local.md`** (개인용)도 자동으로 읽습니다. 이 파일은 `.gitignore`에 등록돼 있어 **본인 노트북에만 남고 다른 팀원과 충돌하지 않습니다**.
 
+이 단계 안 하면 매번 Claude한테 "나 누구야"를 직접 알려줘야 하므로 꼭 해주세요.
+
+### 방법 A — Claude한테 시키기 (추천, 1분)
+
+```bash
+claude
+```
+
+Claude Code UI가 열리면 그 안에 이렇게 입력:
+
+> CLAUDE.local.md.template을 복사해서 내 거 만들어줘. 나는 **[본인 이름]** 이고 역할은 **[BE Lead / FE / LLM / PM 중 하나]** 야. GitHub username은 **[본인 username]** 이고.
+
+Claude가 알아서:
+- template을 `CLAUDE.local.md`로 복사
+- 본인 섹션만 남기고 나머지 3명 섹션 정리
+- GitHub username 채워넣기
+
+> **Memory 저장 제안 나오면 `No` 클릭.** CLAUDE.local.md만 쓰는 게 깔끔합니다.
+
+### 방법 B — 수동으로 (Claude 안 쓰고)
+
 ```bash
 # Windows
 copy CLAUDE.local.md.template CLAUDE.local.md
@@ -149,9 +170,11 @@ copy CLAUDE.local.md.template CLAUDE.local.md
 cp CLAUDE.local.md.template CLAUDE.local.md
 ```
 
-복사 후 VS Code에서 `CLAUDE.local.md`를 열고 **본인 섹션만 남기고 나머지 3명 섹션은 지우세요**. 본인 GitHub username, 선호 작업 스타일 등도 채워넣으면 좋습니다.
+복사한 후 VS Code에서 `CLAUDE.local.md` 열기 → 본인이 아닌 3명의 `## 김강민` / `## 서은빈` / `## 박병진` / `## 오세준` 섹션을 **헤더부터 다음 `---` 줄까지 통째로** 삭제 → 본인 섹션의 GitHub username 등 빈칸 채우기.
 
-이 단계 안 하면 매번 Claude한테 "나 누구야"를 직접 알려줘야 합니다.
+### 확인
+
+저장 후 다음 STEP에서 `claude` 다시 실행하면 본인 이름으로 인식해야 정상.
 
 ---
 
