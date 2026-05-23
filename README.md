@@ -64,7 +64,7 @@ python -m unittest discover -s tests
 | Method | Path | Description |
 |--------|------|-------------|
 | GET | `/api/books` | List all books sorted by rating |
-| POST | `/api/books` | Add a book `{title, author, genre, rating}` |
+| POST | `/api/books` | Add a book `{title, author, rating}` — genre is auto-classified by the Solar LLM (response adds `genre_auto_classified: true`) |
 | GET | `/api/search?q=<query>` | Search books by title (KMP) |
 | GET | `/api/recommendations` | Get Solar LLM recommendations |
 

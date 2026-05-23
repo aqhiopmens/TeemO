@@ -6,7 +6,7 @@ from algorithms.merge_sort import merge_sort
 from algorithms.hashing import BookHashTable
 from algorithms.greedy import greedy_preference_score
 from algorithms.kmp import kmp_search
-from llm.solar import get_recommendations
+from llm.solar import get_recommendations, classify_genre
 
 load_dotenv()
 
@@ -27,17 +27,23 @@ def add_book():
     data = request.get_json(force=True)
     title = (data.get('title') or '').strip()
     author = (data.get('author') or '').strip()
-    genre = (data.get('genre') or '').strip()
     rating = data.get('rating')
 
-    if not title or not author or not genre:
-        return jsonify({'error': '제목, 저자, 장르는 필수 입력 항목입니다'}), 400
+    if not title or not author:
+        return jsonify({'error': '제목과 저자는 필수 입력 항목입니다'}), 400
     if not isinstance(rating, int) or not (1 <= rating <= 5):
         return jsonify({'error': '평점은 1~5 사이의 정수여야 합니다'}), 400
 
+    # Genre is no longer entered by the user — Solar classifies it automatically.
+    genre = classify_genre(title, author)
+
     book = {'title': title, 'author': author, 'genre': genre, 'rating': rating}
     user_books.append(book)
-    return jsonify({'message': '책이 추가되었습니다', 'book': book}), 201
+    return jsonify({
+        'message': '책이 추가되었습니다',
+        'book': book,
+        'genre_auto_classified': True,
+    }), 201
 
 
 @app.route('/api/search', methods=['GET'])
