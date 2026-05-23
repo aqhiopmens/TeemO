@@ -57,7 +57,8 @@ TeemO/
 │   │   ├── merge_sort.py       # Sort books by rating (descending, stable)
 │   │   ├── hashing.py          # BookHashTable, Separate Chaining
 │   │   ├── greedy.py           # Genre preference scoring with rank-bonus
-│   │   └── kmp.py              # KMP string matching with LPS table
+│   │   ├── kmp.py              # KMP string matching with LPS table
+│   │   └── levenshtein.py      # Edit distance via 2D DP — fuzzy search fallback
 │   ├── llm/
 │   │   └── solar.py            # Upstage Solar API client
 │   └── requirements.txt
@@ -170,7 +171,7 @@ When in doubt, just notify in team chat and proceed.
 |---|---|---|
 | GET | `/api/books` | List books sorted by rating (Merge Sort) |
 | POST | `/api/books` | Add a book (validates: title/author required, rating 1–5 int). Genre auto-classified by Solar LLM (`classify_genre`); response adds `genre_auto_classified` |
-| GET | `/api/search?q=<query>` | Search book titles using KMP |
+| GET | `/api/search?q=<query>` | KMP exact match, else Levenshtein fuzzy fallback (≤3); returns `{results, matched_by, did_you_mean}` |
 | GET | `/api/recommendations` | Pipeline: Merge Sort → Hashing (top genres) → Greedy (scores) → Solar LLM |
 
 ## Current Status (as of Week 11)

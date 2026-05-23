@@ -68,10 +68,16 @@ document.getElementById('search-btn').addEventListener('click', async () => {
   const resultsEl = document.getElementById('search-results');
   if (!q) { resultsEl.innerHTML = ''; return; }
   try {
-    const books = await apiFetch(`/search?q=${encodeURIComponent(q)}`);
-    resultsEl.innerHTML = books.length
-      ? books.map(renderBookCard).join('')
-      : '<p class="loading">검색 결과가 없습니다.</p>';
+    const data = await apiFetch(`/search?q=${encodeURIComponent(q)}`);
+    const cards = data.results.map(renderBookCard).join('');
+    if (data.matched_by === 'fuzzy') {
+      resultsEl.innerHTML =
+        `<p class="loading">혹시 '${escapeHtml(data.did_you_mean)}'를 찾으셨나요?</p>` + cards;
+    } else if (data.matched_by === 'exact') {
+      resultsEl.innerHTML = cards;
+    } else {
+      resultsEl.innerHTML = '<p class="loading">결과 없음</p>';
+    }
   } catch (e) {
     resultsEl.innerHTML = `<p class="error">${escapeHtml(e.message)}</p>`;
   }

@@ -17,7 +17,8 @@ TeemO/
 │   │   ├── merge_sort.py       # Sort books by rating
 │   │   ├── hashing.py          # Genre-keyed hash table
 │   │   ├── greedy.py           # Preference score weighting
-│   │   └── kmp.py              # Title search (KMP)
+│   │   ├── kmp.py              # Title search (KMP, exact)
+│   │   └── levenshtein.py      # Edit distance (DP) — fuzzy title search fallback
 │   ├── llm/
 │   │   └── solar.py            # Upstage Solar API client
 │   └── requirements.txt
@@ -65,7 +66,7 @@ python -m unittest discover -s tests
 |--------|------|-------------|
 | GET | `/api/books` | List all books sorted by rating |
 | POST | `/api/books` | Add a book `{title, author, rating}` — genre is auto-classified by the Solar LLM (response adds `genre_auto_classified: true`) |
-| GET | `/api/search?q=<query>` | Search books by title (KMP) |
+| GET | `/api/search?q=<query>` | Search titles — KMP exact match, else Levenshtein fuzzy fallback (≤3). Returns `{results, matched_by, did_you_mean}` |
 | GET | `/api/recommendations` | Get Solar LLM recommendations |
 
 ## Algorithm Concepts Applied
@@ -90,3 +91,11 @@ python -m unittest discover -s tests
 - **Purpose:** Efficient substring title search across the book list
 - **Method:** Knuth–Morris–Pratt with LPS (Longest Proper Prefix-Suffix) table
 - **Complexity:** O(n + m) where n = text length, m = pattern length
+
+### 5. Levenshtein Distance (Dynamic Programming) (`algorithms/levenshtein.py`)
+- **Purpose:** Typo-tolerant title search — when the KMP exact search finds nothing,
+  fall back to fuzzy matching so a misspelled query still surfaces the right book
+  (a "did you mean…?" suggestion)
+- **Method:** Bottom-up 2D DP table; `dp[i][j]` = edit distance between the prefixes
+  `s1[:i]` and `s2[:j]`, minimizing insertion / deletion / substitution
+- **Complexity:** O(m × n) time and space, where m, n are the string lengths
