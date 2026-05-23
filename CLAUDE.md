@@ -117,28 +117,29 @@ We work in **two parallel tracks** to minimize merge conflicts and keep concerns
 - **Cross-track changes**: If LLM track needs a new API field (e.g., for caching), open a PR or issue requesting the BE change rather than modifying `backend/app.py` directly
 - **Tests first when possible**: For algorithms, write a small test script in `backend/tests/` (pytest or standalone)
 
-### Owner Override (김강민 only)
+### Owner Authority (김강민)
 
-As repo owner and BE Lead, 김강민 may directly modify any file — including those in another track's ownership — when **all** of these apply:
+As repo owner and BE Lead, 김강민 has **full authority to modify any file in this repo**. There are no hard-coded "no-go" zones.
 
-- The change is small (typically 1–3 lines) and blocking other work
-- The track owner is **unavailable or not yet set up** with Claude Code / GitHub
-- It's a clear bug fix or trivial config change, **not a design decision**
+**Lightweight procedure** (for history readability, not gatekeeping):
+1. Use the appropriate track branch prefix for the file being touched
+   - LLM file → `feature/llm-*`, frontend file → `feature/app-*`, etc.
+2. PR title or description includes `Owner:` and a one-line reason
+3. @mention the track owner so they're aware (not for approval)
+4. Notify in team chat for non-trivial changes
 
-**Procedure when overriding**:
-1. Branch must use the appropriate track prefix for the file being touched
-   - LLM file → `feature/llm-*` (not `feature/app-*`)
-2. PR title or description must include `Owner override:` and a one-line reason
-3. @mention the track owner so they review retroactively when set up
-4. Notify on team chat before opening the PR
+**Why this is OK for our context**:
+- 4-person, 3-week student project — shipping a working demo > enforcing process
+- Owner is also the most active contributor
+- Track owners retain authority over **design direction** in their domain — they can later refactor / replace owner's quick fixes
+- This formalizes what already happens in practice; reduces Claude Code hesitation on each cross-track edit
 
-**Never override on**:
-- Prompt design changes (LLM track core work)
-- Architecture decisions or refactors
-- Ongoing work in someone else's open branch
-- Files in `frontend/` while 서은빈 is actively editing (check chat first)
+**Track owners are still the design leads**:
+- App/LLM/PM track roles still own the *direction* of their area
+- Owner edits should be **completing** or **unblocking** work, not redesigning
+- If a track owner asks to redo something the owner edited, do it — their domain, their call
 
-The override exists to **unblock progress**, not to bypass collaboration. When in doubt, ask in team chat first — it's almost always faster than the override.
+When in doubt, just notify in team chat and proceed.
 
 ## Coding Conventions
 
