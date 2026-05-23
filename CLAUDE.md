@@ -117,6 +117,29 @@ We work in **two parallel tracks** to minimize merge conflicts and keep concerns
 - **Cross-track changes**: If LLM track needs a new API field (e.g., for caching), open a PR or issue requesting the BE change rather than modifying `backend/app.py` directly
 - **Tests first when possible**: For algorithms, write a small test script in `backend/tests/` (pytest or standalone)
 
+### Owner Override (김강민 only)
+
+As repo owner and BE Lead, 김강민 may directly modify any file — including those in another track's ownership — when **all** of these apply:
+
+- The change is small (typically 1–3 lines) and blocking other work
+- The track owner is **unavailable or not yet set up** with Claude Code / GitHub
+- It's a clear bug fix or trivial config change, **not a design decision**
+
+**Procedure when overriding**:
+1. Branch must use the appropriate track prefix for the file being touched
+   - LLM file → `feature/llm-*` (not `feature/app-*`)
+2. PR title or description must include `Owner override:` and a one-line reason
+3. @mention the track owner so they review retroactively when set up
+4. Notify on team chat before opening the PR
+
+**Never override on**:
+- Prompt design changes (LLM track core work)
+- Architecture decisions or refactors
+- Ongoing work in someone else's open branch
+- Files in `frontend/` while 서은빈 is actively editing (check chat first)
+
+The override exists to **unblock progress**, not to bypass collaboration. When in doubt, ask in team chat first — it's almost always faster than the override.
+
 ## Coding Conventions
 
 ### Python (Backend)
