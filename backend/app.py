@@ -6,6 +6,7 @@ from algorithms.merge_sort import merge_sort
 from algorithms.hashing import BookHashTable
 from algorithms.greedy import greedy_preference_score
 from algorithms.kmp import kmp_search
+from algorithms.levenshtein import levenshtein_distance
 from llm.solar import get_recommendations, classify_genre
 
 load_dotenv()
@@ -46,11 +47,33 @@ def add_book():
     }), 201
 
 
+FUZZY_DISTANCE_THRESHOLD = 3
+
+
 @app.route('/api/search', methods=['GET'])
 def search_books():
-    query = (request.args.get('q') or '').lower()
-    results = [b for b in user_books if kmp_search(b['title'].lower(), query) != -1]
-    return jsonify(results)
+    query = (request.args.get('q') or '').strip().lower()
+
+    # Stage 1: exact substring match via KMP.
+    exact = [b for b in user_books if kmp_search(b['title'].lower(), query) != -1]
+    if exact:
+        return jsonify({'results': exact, 'matched_by': 'exact', 'did_you_mean': None})
+
+    # Stage 2: fuzzy fallback — Levenshtein distance against every title,
+    # keeping those within the threshold, closest first.
+    scored = [(levenshtein_distance(query, b['title'].lower()), b) for b in user_books]
+    near = sorted(
+        (pair for pair in scored if pair[0] <= FUZZY_DISTANCE_THRESHOLD),
+        key=lambda pair: pair[0],
+    )
+    if near:
+        return jsonify({
+            'results': [b for _, b in near],
+            'matched_by': 'fuzzy',
+            'did_you_mean': near[0][1]['title'],
+        })
+
+    return jsonify({'results': [], 'matched_by': 'none', 'did_you_mean': None})
 
 
 @app.route('/api/recommendations', methods=['GET'])
