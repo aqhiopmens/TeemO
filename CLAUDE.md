@@ -12,6 +12,41 @@
 - **LLM**: Upstage Solar (`solar-pro` model) via REST API
 - **Storage**: In-memory (Python list) — persistence is a future consideration
 
+## Team Operating Environment (claude.ai 웹 + Claude Code 병행)
+
+본 팀은 두 가지 Claude 표면을 병행 사용합니다.
+
+### Claude Code (이 환경)
+- 모든 **코드 작업**: 파일 편집, 실행, 테스트, 디버깅, 커밋
+- 본 `CLAUDE.md` + 본인의 `CLAUDE.local.md`를 컨텍스트로 사용
+- 4명이 김강민 Claude 계정 공유 (각자 본인 노트북에서 `claude` 실행)
+
+### claude.ai 웹 채팅 — Project 5개
+| Project | 용도 | 주 사용자 |
+|---|---|---|
+| TeemO - 공유 | 공유 문서 작성·갱신 (개발 프로세스 문서, 회의록, 주간 보고, README) | 김강민 |
+| TeemO - 김강민 (Backend) | 알고리즘 설계 논의, 코드 리뷰 상담 | 김강민 |
+| TeemO - 서은빈 (Frontend) | UI/UX 설계, Artifacts 디자인 프리뷰 | 서은빈 |
+| TeemO - 박병진 (LLM) | 프롬프트 설계, 응답 품질 분석 | 박병진 |
+| TeemO - 오세준 (PM) | 일정 관리, 전체 진행 점검 | 오세준 |
+
+각 Project에는 Google Drive sync로 개발 프로세스 문서가 연결되어 있어, 웹에서 작업 시 최신 진행 상황을 항상 참조 가능.
+
+### 역할 분담 보강
+- **공유 문서 작업** (개발 프로세스 문서, 회의록, 주간 보고, README): 김강민
+- **발표 슬라이드·기술 보고서** (영문, 6/4~6/8): 팀 전원이 함께 작업
+- **코드 작업**은 위 표의 본인 담당 폴더에 한정, Claude Code로 진행
+
+### 어디서 뭘 할지
+| 작업 | 어디서 |
+|---|---|
+| 파일 직접 수정·실행·테스트 | Claude Code |
+| 알고리즘 설계 논의, 복잡도 분석 | 웹 (본인 Project) |
+| UI 시안 빠른 프리뷰 | 웹 (서은빈 Project, Artifacts) |
+| 프롬프트 v2 설계·응답 비교 | 웹 (박병진 Project) |
+| 회의록·주간 보고 작성 | 웹 (공유 Project, 김강민) |
+| 영문 발표 슬라이드 | 웹 (공유 또는 오세준 Project, 팀 전원) |
+
 ## Repository Structure
 
 ```
