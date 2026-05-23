@@ -31,13 +31,13 @@ def add_book():
     rating = data.get('rating')
 
     if not title or not author or not genre:
-        return jsonify({'error': 'title, author, and genre are required'}), 400
+        return jsonify({'error': '제목, 저자, 장르는 필수 입력 항목입니다'}), 400
     if not isinstance(rating, int) or not (1 <= rating <= 5):
-        return jsonify({'error': 'rating must be an integer between 1 and 5'}), 400
+        return jsonify({'error': '평점은 1~5 사이의 정수여야 합니다'}), 400
 
     book = {'title': title, 'author': author, 'genre': genre, 'rating': rating}
     user_books.append(book)
-    return jsonify({'message': 'Book added', 'book': book}), 201
+    return jsonify({'message': '책이 추가되었습니다', 'book': book}), 201
 
 
 @app.route('/api/search', methods=['GET'])
@@ -50,7 +50,7 @@ def search_books():
 @app.route('/api/recommendations', methods=['GET'])
 def recommendations():
     if not user_books:
-        return jsonify({'error': 'No books added yet'}), 400
+        return jsonify({'error': '아직 추가된 책이 없습니다'}), 400
 
     sorted_books = merge_sort(user_books.copy(), key='rating')
 

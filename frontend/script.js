@@ -39,7 +39,7 @@ async function loadBooks() {
     const books = await apiFetch('/books');
     listEl.innerHTML = books.length
       ? books.map(renderBookCard).join('')
-      : '<p class="loading">No books added yet.</p>';
+      : '<p class="loading">아직 추가된 책이 없습니다.</p>';
   } catch (e) {
     listEl.innerHTML = `<p class="error">${escapeHtml(e.message)}</p>`;
   }
@@ -59,7 +59,7 @@ document.getElementById('book-form').addEventListener('submit', async (e) => {
     e.target.reset();
     await loadBooks();
   } catch (err) {
-    alert('Error: ' + err.message);
+    alert('오류: ' + err.message);
   }
 });
 
@@ -72,7 +72,7 @@ document.getElementById('search-btn').addEventListener('click', async () => {
     const books = await apiFetch(`/search?q=${encodeURIComponent(q)}`);
     resultsEl.innerHTML = books.length
       ? books.map(renderBookCard).join('')
-      : '<p class="loading">No results found.</p>';
+      : '<p class="loading">검색 결과가 없습니다.</p>';
   } catch (e) {
     resultsEl.innerHTML = `<p class="error">${escapeHtml(e.message)}</p>`;
   }
@@ -81,17 +81,17 @@ document.getElementById('search-btn').addEventListener('click', async () => {
 // Get AI recommendations
 document.getElementById('get-recs-btn').addEventListener('click', async () => {
   const recsEl = document.getElementById('recommendations');
-  recsEl.textContent = 'Analyzing your preferences…';
+  recsEl.textContent = '취향을 분석하는 중입니다…';
   recsEl.className = 'loading';
   try {
     const data = await apiFetch('/recommendations');
     recsEl.className = '';
     recsEl.innerHTML =
-      `<strong>Top genres:</strong> ${escapeHtml(data.top_genres.join(', '))}\n\n` +
+      `<strong>선호 장르:</strong> ${escapeHtml(data.top_genres.join(', '))}\n\n` +
       escapeHtml(data.recommendations);
   } catch (e) {
     recsEl.className = 'error';
-    recsEl.textContent = 'Error: ' + e.message;
+    recsEl.textContent = '오류: ' + e.message;
   }
 });
 
