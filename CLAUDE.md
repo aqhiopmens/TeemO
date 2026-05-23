@@ -169,7 +169,7 @@ When in doubt, just notify in team chat and proceed.
 | Method | Path | Purpose |
 |---|---|---|
 | GET | `/api/books` | List books sorted by rating (Merge Sort) |
-| POST | `/api/books` | Add a book (validates: title/author/genre required, rating 1–5 int) |
+| POST | `/api/books` | Add a book (validates: title/author required, rating 1–5 int). Genre auto-classified by Solar LLM (`classify_genre`); response adds `genre_auto_classified` |
 | GET | `/api/search?q=<query>` | Search book titles using KMP |
 | GET | `/api/recommendations` | Pipeline: Merge Sort → Hashing (top genres) → Greedy (scores) → Solar LLM |
 

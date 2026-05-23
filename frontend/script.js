@@ -51,7 +51,6 @@ document.getElementById('book-form').addEventListener('submit', async (e) => {
   const body = {
     title: document.getElementById('title').value.trim(),
     author: document.getElementById('author').value.trim(),
-    genre: document.getElementById('genre').value.trim(),
     rating: parseInt(document.getElementById('rating').value, 10),
   };
   try {
