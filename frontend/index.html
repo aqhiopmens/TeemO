@@ -1,49 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TeemO — Book Recommendations</title>
+  <title>TeemO — 도서 추천</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
     <h1>TeemO</h1>
-    <p>AI-powered book preference analysis &amp; recommendations</p>
+    <p>AI 기반 독서 취향 분석 &amp; 도서 추천</p>
   </header>
 
   <main>
     <section id="add-book">
-      <h2>Add a Book You've Read</h2>
+      <h2>읽은 책 추가하기</h2>
       <form id="book-form">
-        <input type="text" id="title" placeholder="Book Title" required />
-        <input type="text" id="author" placeholder="Author" required />
-        <input type="text" id="genre" placeholder="Genre (e.g. Fiction, Sci-Fi)" required />
+        <input type="text" id="title" placeholder="책 제목" required />
+        <input type="text" id="author" placeholder="저자" required />
+        <input type="text" id="genre" placeholder="장르 (예: 소설, SF)" required />
         <label>
-          Rating (1–5):
+          평점 (1~5):
           <input type="number" id="rating" min="1" max="5" required />
         </label>
-        <button type="submit">Add Book</button>
+        <button type="submit">책 추가</button>
       </form>
     </section>
 
     <section id="search-section">
-      <h2>Search Your Books</h2>
+      <h2>내 책 검색</h2>
       <div class="search-bar">
-        <input type="text" id="search-input" placeholder="Search by title..." />
-        <button id="search-btn">Search</button>
+        <input type="text" id="search-input" placeholder="제목으로 검색..." />
+        <button id="search-btn">검색</button>
       </div>
       <div id="search-results"></div>
     </section>
 
     <section id="book-list-section">
-      <h2>Your Reading List</h2>
+      <h2>내 독서 목록</h2>
       <div id="book-list"></div>
     </section>
 
     <section id="recommendations-section">
-      <h2>AI Recommendations</h2>
-      <button id="get-recs-btn">Get Recommendations</button>
+      <h2>AI 추천</h2>
+      <button id="get-recs-btn">추천 받기</button>
       <div id="recommendations"></div>
     </section>
   </main>

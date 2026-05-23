@@ -23,7 +23,8 @@ def get_recommendations(books, top_genres, preference_scores):
         f"Preference scores by genre: {score_str}\n\n"
         "Based on this reading history and preferences, recommend 5 books the user would love next.\n"
         "For each book provide: title, author, genre, and a brief reason (1-2 sentences) "
-        "why it matches their taste. Format as a numbered list."
+        "why it matches their taste. Format as a numbered list.\n\n"
+        "Respond in Korean."  # Owner override: align output language with the Korean UI
     )
 
     headers = {
