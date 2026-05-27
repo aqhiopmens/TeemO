@@ -50,26 +50,102 @@ main > section:nth-child(5) { animation-delay: 0.25s; }
 
 /* ── Hero ─────────────────────────────────────────────────── */
 .hero {
+  position: relative;
+  overflow: hidden;
   background:
-    radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.22), transparent 42%),
-    radial-gradient(circle at 88% 0%, rgba(255, 255, 255, 0.16), transparent 38%),
-    linear-gradient(135deg, #3182f6 0%, #6f9bff 100%);
+    radial-gradient(ellipse at top left, rgba(177, 151, 252, 0.35) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom right, rgba(255, 107, 107, 0.25) 0%, transparent 50%),
+    radial-gradient(ellipse at center, rgba(81, 207, 102, 0.15) 0%, transparent 60%),
+    linear-gradient(135deg, #3182f6 0%, #1b64da 100%);
   color: white;
+  padding: 3.5rem 2rem 4rem;
   text-align: center;
-  padding: 4.5rem 2rem 5rem;
 }
 
-.hero h1 {
-  font-size: 3rem;
+.hero-bg-decoration {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.floating-card {
+  position: absolute;
+  width: 64px;
+  height: 84px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  animation: float 6s ease-in-out infinite;
+}
+
+.card-1 { top: 15%; left: 8%; transform: rotate(-12deg); animation-delay: 0s; --r: -12deg; }
+.card-2 { top: 25%; right: 10%; transform: rotate(8deg); animation-delay: 2s; --r: 8deg; }
+.card-3 { bottom: 15%; left: 18%; transform: rotate(-5deg); animation-delay: 4s; --r: -5deg; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); }
+  50% { transform: translateY(-12px) rotate(var(--r, 0deg)); }
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.hero-badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 0.35rem 0.95rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  margin-bottom: 1.2rem;
+}
+
+.hero-title {
+  font-size: 4rem;
   font-weight: 800;
-  letter-spacing: -1px;
-  margin-bottom: 0.6rem;
+  letter-spacing: -1.5px;
+  line-height: 1.05;
+  margin-bottom: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
 }
 
-.hero p {
-  font-size: 1.3rem;
+.logo-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #3182f6;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.logo-mark svg { width: 30px; height: 30px; }
+
+.hero-subtitle {
+  font-size: 1.18rem;
   font-weight: 500;
-  opacity: 0.94;
+  opacity: 0.95;
+  letter-spacing: 0.1px;
 }
 
 /* ── Layout ───────────────────────────────────────────────── */
@@ -476,11 +552,15 @@ button:active {
 
 /* ── Responsive ───────────────────────────────────────────── */
 @media (max-width: 600px) {
-  .hero { padding: 3.5rem 1.5rem 4rem; }
-  .hero h1 { font-size: 2.3rem; }
-  .hero p { font-size: 1.1rem; }
   #stats-dashboard { grid-template-columns: 1fr; }
   #book-list,
   #search-results { grid-template-columns: 1fr; }
   section { padding: 1.5rem; }
+}
+
+@media (max-width: 640px) {
+  .hero { padding: 2.5rem 1rem 3rem; }
+  .hero-title { font-size: 2.6rem; }
+  .floating-card { width: 48px; height: 64px; font-size: 1.4rem; }
+  .hero-subtitle { font-size: 1rem; }
 }
