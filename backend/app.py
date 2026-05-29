@@ -18,6 +18,11 @@ CORS(app)
 user_books = []
 
 
+def _normalize(s):
+    """Normalize title/author for duplicate detection — case- and space-insensitive."""
+    return (s or "").lower().replace(" ", "").strip()
+
+
 @app.route('/api/books', methods=['GET'])
 def get_books():
     return jsonify(merge_sort(user_books.copy(), key='rating'))
@@ -35,6 +40,12 @@ def add_book():
     if not isinstance(rating, int) or not (1 <= rating <= 5):
         return jsonify({'error': '평점은 1~5 사이의 정수여야 합니다'}), 400
 
+    # Duplicate guard: compare normalized (title, author) tuples.
+    new_key = (_normalize(title), _normalize(author))
+    for existing in user_books:
+        if (_normalize(existing['title']), _normalize(existing['author'])) == new_key:
+            return jsonify({'error': '이미 등록된 책입니다', 'existing': existing}), 409
+
     # Genre is no longer entered by the user — Solar classifies it automatically.
     genre = classify_genre(title, author)
 
@@ -45,6 +56,14 @@ def add_book():
         'book': book,
         'genre_auto_classified': True,
     }), 201
+
+
+@app.route('/api/books/<int:index>', methods=['DELETE'])
+def delete_book(index):
+    if index < 0 or index >= len(user_books):
+        return jsonify({'error': 'book not found'}), 404
+    deleted = user_books.pop(index)
+    return jsonify({'message': 'deleted', 'book': deleted}), 200
 
 
 FUZZY_DISTANCE_THRESHOLD = 3

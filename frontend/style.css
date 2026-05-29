@@ -126,11 +126,33 @@ button:hover {
 }
 
 .book-card {
+  position: relative;
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 0.8rem 1rem;
   margin-bottom: 0.5rem;
+}
+
+.delete-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.6rem;
+  background: transparent;
+  border: none;
+  font-size: 1.3rem;
+  line-height: 1;
+  color: var(--muted, #999);
+  cursor: pointer;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  transition: all 0.15s;
+  align-self: auto;
+}
+
+.delete-btn:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
 }
 
 .book-card .title {
