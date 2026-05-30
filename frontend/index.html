@@ -4,31 +4,70 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TeemO — 도서 추천</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header>
-    <h1>TeemO</h1>
-    <p>AI 기반 독서 취향 분석 &amp; 도서 추천</p>
+  <header class="hero">
+    <div class="hero-bg-decoration">
+      <div class="floating-card card-1">📕</div>
+      <div class="floating-card card-2">📗</div>
+      <div class="floating-card card-3">📘</div>
+    </div>
+    <div class="hero-content">
+      <h1 class="hero-title">
+        <span class="logo-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+          </svg>
+        </span>
+        TeemO
+      </h1>
+      <p class="hero-subtitle">AI가 분석하는 나만의 독서 취향 &amp; 책 추천</p>
+    </div>
   </header>
 
   <main>
+    <!-- 통계 대시보드 -->
+    <section id="stats-dashboard" aria-label="독서 통계">
+      <div class="stat-card stat-books">
+        <div class="stat-value" id="stat-count">—</div>
+        <div class="stat-label">📚 읽은 책</div>
+      </div>
+      <div class="stat-card stat-rating">
+        <div class="stat-value" id="stat-avg">—</div>
+        <div class="stat-label">⭐ 평균 별점</div>
+      </div>
+      <div class="stat-card stat-genre">
+        <div class="stat-value" id="stat-genre">—</div>
+        <div class="stat-label">🎨 Top 장르</div>
+      </div>
+    </section>
+
     <section id="add-book">
-      <h2>읽은 책 추가하기</h2>
+      <h2>📚 읽은 책 추가하기</h2>
       <form id="book-form">
         <input type="text" id="title" placeholder="책 제목" required />
         <input type="text" id="author" placeholder="저자" required />
-        <small>장르는 AI가 자동으로 분류해드려요</small>
-        <label>
-          평점 (1~5):
-          <input type="number" id="rating" min="1" max="5" required />
-        </label>
-        <button type="submit">책 추가</button>
+        <small>장르는 AI가 자동으로 분류해드려요 ✨</small>
+        <div class="rating-input">
+          <span class="rating-label">평점</span>
+          <div class="star-picker" id="star-picker" role="radiogroup" aria-label="평점 선택 (1~5)">
+            <button type="button" class="star" data-value="1" aria-label="1점">★</button>
+            <button type="button" class="star" data-value="2" aria-label="2점">★</button>
+            <button type="button" class="star" data-value="3" aria-label="3점">★</button>
+            <button type="button" class="star" data-value="4" aria-label="4점">★</button>
+            <button type="button" class="star" data-value="5" aria-label="5점">★</button>
+          </div>
+          <input type="hidden" id="rating" />
+        </div>
+        <button type="submit">책 추가하기</button>
       </form>
     </section>
 
     <section id="search-section">
-      <h2>내 책 검색</h2>
+      <h2>🔍 내 책 검색</h2>
       <div class="search-bar">
         <input type="text" id="search-input" placeholder="제목으로 검색..." />
         <button id="search-btn">검색</button>
@@ -37,13 +76,13 @@
     </section>
 
     <section id="book-list-section">
-      <h2>내 독서 목록</h2>
+      <h2>📖 내 독서 목록</h2>
       <div id="book-list"></div>
     </section>
 
     <section id="recommendations-section">
-      <h2>AI 추천</h2>
-      <button id="get-recs-btn">추천 받기</button>
+      <h2>✨ AI 추천</h2>
+      <button id="get-recs-btn">✨ 책 추천 받기</button>
       <div id="recommendations"></div>
     </section>
   </main>
