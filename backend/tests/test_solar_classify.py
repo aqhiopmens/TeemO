@@ -44,6 +44,13 @@ class TestClassifyGenre(unittest.TestCase):
         mock_post.return_value = _mock_response('   ')
         self.assertEqual(classify_genre('제목', '저자'), 'Unknown')
 
+    @patch.dict('os.environ', {'UPSTAGE_API_KEY': 'test-key'})
+    @patch('llm.solar.requests.post')
+    def test_off_candidate_word_collapses_to_etc(self, mock_post):
+        # Prompt v2: 후보 목록(GENRE_CANDIDATES) 밖의 단어는 "기타"로 흡수된다.
+        mock_post.return_value = _mock_response('로맨스')
+        self.assertEqual(classify_genre('제목', '저자'), '기타')
+
     @patch.dict('os.environ', {}, clear=True)
     def test_missing_api_key_returns_unknown(self):
         # No network call should happen when the key is absent.
