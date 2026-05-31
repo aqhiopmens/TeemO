@@ -62,6 +62,40 @@ class BookEndpointsTestCase(unittest.TestCase):
         self.assertEqual(self._add('동명소설', '저자B').status_code, 201)
         self.assertEqual(len(user_books), 2)
 
+    # ── GET stable index (_idx) ─────────────────────────────────
+    def test_get_books_includes_idx_field(self):
+        self._add('책1', '저자', rating=3)
+        self._add('책2', '저자', rating=5)
+        books = self.client.get('/api/books').get_json()
+        self.assertEqual(len(books), 2)
+        for b in books:
+            self.assertIn('_idx', b)
+
+    def test_get_books_idx_is_storage_position_not_sorted_position(self):
+        # Insertion order: 낮은별점(0) → 높은별점(1). GET sorts by rating desc,
+        # so 높은별점 comes first in the response but must keep _idx == 1.
+        self._add('낮은별점', '저자', rating=2)
+        self._add('높은별점', '저자', rating=5)
+        books = self.client.get('/api/books').get_json()
+        # Sorted: 높은별점 first.
+        self.assertEqual(books[0]['title'], '높은별점')
+        self.assertEqual(books[0]['_idx'], 1)   # storage position, not 0
+        self.assertEqual(books[1]['title'], '낮은별점')
+        self.assertEqual(books[1]['_idx'], 0)
+
+    def test_delete_by_idx_from_sorted_response_removes_intended_book(self):
+        # Regression: deleting by the _idx carried in the GET response must
+        # remove exactly the displayed book, never a different one.
+        self._add('낮은별점', '저자', rating=2)
+        self._add('높은별점', '저자', rating=5)
+        top = self.client.get('/api/books').get_json()[0]   # 높은별점, _idx == 1
+        self.assertEqual(top['title'], '높은별점')
+        res = self.client.delete(f"/api/books/{top['_idx']}")
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.get_json()['book']['title'], '높은별점')
+        remaining = [b['title'] for b in user_books]
+        self.assertEqual(remaining, ['낮은별점'])
+
     # ── Delete ──────────────────────────────────────────────────
     def test_delete_existing_book_returns_200(self):
         self._add('지울책', '저자')
