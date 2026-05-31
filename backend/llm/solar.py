@@ -1,8 +1,15 @@
 import json
 import os
+from collections import OrderedDict
+
 import requests
 
 SOLAR_API_URL = "https://api.upstage.ai/v1/chat/completions"
+
+# get_recommendations 응답 LRU 캐시. 같은 독서 이력으로 반복 호출 시
+# Solar API 호출을 아껴 공유 rate limit 부담을 줄인다.
+_cache = OrderedDict()
+_CACHE_MAX = 50
 
 # 자동 장르 분류가 사용할 수 있는 유일한 후보 집합.
 # classify_genre 는 이 목록 밖의 값을 절대 반환하지 않는다.
@@ -22,6 +29,14 @@ def get_recommendations(books, top_genres, preference_scores):
     돌려준다 — 호출부(app.py)와 프론트가 항상 dict/list만 다루면 되도록.
     """
     try:
+        # 캐시 키: 책의 (제목, 저자, 평점) 집합 — 순서 무관(sorted).
+        cache_key = hash(tuple(sorted(
+            (b["title"], b["author"], b["rating"]) for b in books
+        )))
+        if cache_key in _cache:
+            _cache.move_to_end(cache_key)  # 최근 사용으로 갱신 (LRU)
+            return _cache[cache_key]
+
         api_key = os.getenv("UPSTAGE_API_KEY")
         if not api_key:
             raise ValueError("UPSTAGE_API_KEY not set in environment")
@@ -68,7 +83,14 @@ def get_recommendations(books, top_genres, preference_scores):
         response.raise_for_status()
         content = response.json()["choices"][0]["message"]["content"]
         parsed = json.loads(content)
-        return parsed["recommendations"]
+        result = parsed["recommendations"]
+
+        # 성공(리스트) 결과만 캐시에 저장. error dict는 저장하지 않는다.
+        if isinstance(result, list):
+            if len(_cache) >= _CACHE_MAX:
+                _cache.popitem(last=False)  # 가장 오래된 항목 제거 (LRU eviction)
+            _cache[cache_key] = result
+        return result
 
     except requests.Timeout:
         return {"error": "응답 시간 초과"}
