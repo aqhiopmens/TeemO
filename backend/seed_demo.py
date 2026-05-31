@@ -29,8 +29,9 @@ import sys
 
 import requests
 
-# Curated pool of recognizable titles (good Google Books cover hit-rate) across
-# diverse genres so a random subset still yields varied genres + recommendations.
+# Curated pool of recognizable titles across diverse genres. Every entry was
+# verified to resolve a Google Books cover via fetch_cover_url, so any random
+# subset shows 100% covers (titles that didn't resolve were dropped).
 BOOK_POOL = [
     # 소설
     ("채식주의자", "한강"),
@@ -49,8 +50,6 @@ BOOK_POOL = [
     ("안나 카레니나", "레프 톨스토이"),
     ("변신", "프란츠 카프카"),
     ("82년생 김지영", "조남주"),
-    ("불편한 편의점", "김호연"),
-    ("아몬드", "손원평"),
     # SF
     ("1984", "조지 오웰"),
     ("듄", "프랭크 허버트"),
@@ -66,7 +65,6 @@ BOOK_POOL = [
     ("그리고 아무도 없었다", "애거사 크리스티"),
     ("오리엔트 특급 살인", "애거사 크리스티"),
     ("셜록 홈즈의 모험", "아서 코난 도일"),
-    ("용의자 X의 헌신", "히가시노 게이고"),
     ("화차", "미야베 미유키"),
     # 인문
     ("사피엔스", "유발 하라리"),
