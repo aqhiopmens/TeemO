@@ -24,12 +24,14 @@ TeemO/
 │   │   └── levenshtein.py      # Edit distance (DP) — fuzzy title search fallback
 │   ├── llm/
 │   │   └── solar.py            # Upstage Solar API client
+│   ├── integrations/
+│   │   └── google_books.py    # Best-effort book cover lookup (Google Books API)
 │   └── requirements.txt
 ├── frontend/
 │   ├── index.html
 │   ├── style.css
 │   └── script.js
-├── .env                        # (not committed) UPSTAGE_API_KEY=...
+├── .env                        # (not committed) UPSTAGE_API_KEY=..., GOOGLE_BOOKS_API_KEY=...
 └── README.md
 ```
 
@@ -46,6 +48,10 @@ pip install -r backend/requirements.txt
 
 # 3. Create .env in the project root
 echo UPSTAGE_API_KEY=your_key_here > .env
+# (optional) book covers — without a key, anonymous Google Books calls
+# share a low daily quota per IP and may return no cover (HTTP 429).
+# A free key (Google Cloud → enable "Books API") raises the quota.
+echo GOOGLE_BOOKS_API_KEY=your_key_here >> .env
 
 # 4. Run the backend
 cd backend
@@ -68,7 +74,7 @@ python -m unittest discover -s tests
 | Method | Path | Description |
 |--------|------|-------------|
 | GET | `/api/books` | List all books sorted by rating |
-| POST | `/api/books` | Add a book `{title, author, rating}` — genre is auto-classified by the Solar LLM (response adds `genre_auto_classified: true`) |
+| POST | `/api/books` | Add a book `{title, author, rating}` — genre is auto-classified by the Solar LLM (response adds `genre_auto_classified: true`). A best-effort cover image is looked up via Google Books and returned as `cover_url` (`null` if not found) |
 | GET | `/api/search?q=<query>` | Search titles — KMP exact match, else Levenshtein fuzzy fallback (≤3). Returns `{results, matched_by, did_you_mean}` |
 | GET | `/api/recommendations` | Get Solar LLM recommendations |
 
