@@ -334,7 +334,10 @@ document.getElementById('book-scroll').addEventListener('click', async (e) => {
 async function loadBooks(opts = {}) {
   try {
     const books = await apiFetch('/books');
-    ALL = books.map((b, i) => ({ ...b, _idx: i }));
+    // Prefer the backend's _idx (original storage index) so deletes hit the
+    // right book even though GET returns a rating-sorted list. Fall back to
+    // the array position only if the backend didn't supply it (e.g. mock).
+    ALL = books.map((b, i) => ({ ...b, _idx: b._idx ?? i }));
     updateStats(books);
     buildFilterChips();
     if (opts.reset) shown = PAGE;

@@ -171,7 +171,7 @@ When in doubt, just notify in team chat and proceed.
 ## API Endpoints (Current)
 | Method | Path | Purpose |
 |---|---|---|
-| GET | `/api/books` | List books sorted by rating (Merge Sort) |
+| GET | `/api/books` | List books sorted by rating (Merge Sort). Each book includes `_idx` (original `user_books` storage index) so DELETE targets the correct book despite sorting |
 | POST | `/api/books` | Add a book (validates: title/author required, rating 1–5 int). Genre auto-classified by Solar LLM (`classify_genre`); response adds `genre_auto_classified`. Cover looked up via Google Books (`fetch_cover_url`) → `cover_url` (None on miss/quota; set `GOOGLE_BOOKS_API_KEY` for reliable quota) |
 | GET | `/api/search?q=<query>` | KMP exact match, else Levenshtein fuzzy fallback (≤3); returns `{results, matched_by, did_you_mean}` |
 | GET | `/api/recommendations` | Pipeline: Merge Sort → Hashing (top genres) → Greedy (scores) → Solar LLM |

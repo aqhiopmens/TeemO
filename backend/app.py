@@ -26,7 +26,11 @@ def _normalize(s):
 
 @app.route('/api/books', methods=['GET'])
 def get_books():
-    return jsonify(merge_sort(user_books.copy(), key='rating'))
+    # Tag each book with its original position in user_books (_idx) BEFORE
+    # sorting, so the client can delete by storage index rather than by the
+    # sorted display position (which would otherwise target the wrong book).
+    indexed = [{**b, '_idx': i} for i, b in enumerate(user_books)]
+    return jsonify(merge_sort(indexed, key='rating'))
 
 
 @app.route('/api/books', methods=['POST'])
