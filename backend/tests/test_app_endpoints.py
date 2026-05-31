@@ -24,6 +24,10 @@ class BookEndpointsTestCase(unittest.TestCase):
         patcher = patch('app.classify_genre', return_value='Unknown')
         self.mock_classify = patcher.start()
         self.addCleanup(patcher.stop)
+        # Block real Google Books calls — cover lookup always returns None.
+        cover_patcher = patch('app.fetch_cover_url', return_value=None)
+        self.mock_cover = cover_patcher.start()
+        self.addCleanup(cover_patcher.stop)
 
     def _add(self, title, author, rating=4):
         return self.client.post(

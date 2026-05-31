@@ -8,6 +8,7 @@ from algorithms.greedy import greedy_preference_score
 from algorithms.kmp import kmp_search
 from algorithms.levenshtein import levenshtein_distance
 from llm.solar import get_recommendations, classify_genre
+from integrations.google_books import fetch_cover_url
 
 load_dotenv()
 
@@ -49,7 +50,11 @@ def add_book():
     # Genre is no longer entered by the user — Solar classifies it automatically.
     genre = classify_genre(title, author)
 
-    book = {'title': title, 'author': author, 'genre': genre, 'rating': rating}
+    # Best-effort cover lookup via Google Books — None if not found / on error.
+    cover_url = fetch_cover_url(title, author)
+
+    book = {'title': title, 'author': author, 'genre': genre,
+            'rating': rating, 'cover_url': cover_url}
     user_books.append(book)
     return jsonify({
         'message': '책이 추가되었습니다',

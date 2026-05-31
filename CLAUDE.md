@@ -61,6 +61,8 @@ TeemO/
 │   │   └── levenshtein.py      # Edit distance via 2D DP — fuzzy search fallback
 │   ├── llm/
 │   │   └── solar.py            # Upstage Solar API client
+│   ├── integrations/
+│   │   └── google_books.py    # Best-effort cover lookup (fetch_cover_url) — None on quota/miss
 │   └── requirements.txt
 ├── frontend/
 │   ├── index.html              # 4 sections: add / search / list / recommendations
@@ -170,7 +172,7 @@ When in doubt, just notify in team chat and proceed.
 | Method | Path | Purpose |
 |---|---|---|
 | GET | `/api/books` | List books sorted by rating (Merge Sort) |
-| POST | `/api/books` | Add a book (validates: title/author required, rating 1–5 int). Genre auto-classified by Solar LLM (`classify_genre`); response adds `genre_auto_classified` |
+| POST | `/api/books` | Add a book (validates: title/author required, rating 1–5 int). Genre auto-classified by Solar LLM (`classify_genre`); response adds `genre_auto_classified`. Cover looked up via Google Books (`fetch_cover_url`) → `cover_url` (None on miss/quota; set `GOOGLE_BOOKS_API_KEY` for reliable quota) |
 | GET | `/api/search?q=<query>` | KMP exact match, else Levenshtein fuzzy fallback (≤3); returns `{results, matched_by, did_you_mean}` |
 | GET | `/api/recommendations` | Pipeline: Merge Sort → Hashing (top genres) → Greedy (scores) → Solar LLM |
 
