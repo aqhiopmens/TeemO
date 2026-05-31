@@ -1,3 +1,4 @@
+import json
 import os
 import requests
 
@@ -26,8 +27,8 @@ def get_recommendations(books, top_genres, preference_scores):
     genre_str = ", ".join(top_genres) if top_genres else "다양함"
     score_str = ", ".join(f"{g}: {s}" for g, s in preference_scores.items())
 
-    # Prompt v2: 영어 → 한국어 전면 재작성. 친근한 말투 + 추천 사유 2~3문장,
-    #            평문(마크다운 금지) 응답 강제.
+    # Prompt v2 + JSON 구조화: 한국어 친근체 + 추천 사유 2~3문장
+    # + 응답을 JSON 형식으로 강제 (프론트 카드 UI 렌더용)
     prompt = (
         "너는 책을 잘 아는 친한 친구 같은 책 추천 도우미야. 편하고 다정한 말투로 이야기해줘.\n\n"
         f"내가 지금까지 읽고 평점을 매긴 책들이야:\n{book_list}\n\n"
@@ -35,8 +36,11 @@ def get_recommendations(books, top_genres, preference_scores):
         f"장르별 선호 점수: {score_str}\n\n"
         "이 독서 이력과 취향을 바탕으로, 내가 다음에 읽으면 좋아할 책 5권을 추천해줘.\n"
         "각 책마다 제목, 저자, 장르를 알려주고, 왜 내 취향에 맞는지 추천 사유를 "
-        "2~3문장으로 친근하게 설명해줘.\n"
-        "번호를 붙인 목록(1. 2. 3. ...) 형태로 정리해줘.\n\n"
+        "2~3문장으로 친근하게 설명해줘.\n\n"
+        "응답은 정확히 다음 JSON 형식으로만 해줘 — 다른 텍스트, 설명, 코드펜스, 마크다운 절대 금지. "
+        "배열에는 정확히 5개 책:\n"
+        '{"recommendations": [{"title": "책제목", "author": "저자", '
+        '"genre": "장르", "reason": "추천사유"}, ...]}\n\n'
         f"{_NO_MARKDOWN}"
     )
 
@@ -56,7 +60,15 @@ def get_recommendations(books, top_genres, preference_scores):
 
     response = requests.post(SOLAR_API_URL, json=payload, headers=headers)
     response.raise_for_status()
-    return response.json()["choices"][0]["message"]["content"]
+    content = response.json()["choices"][0]["message"]["content"]
+
+    # 구조화 응답 처리: JSON 파싱 성공 시 recommendations 리스트를 반환하고,
+    # 모델이 형식을 어겨 파싱에 실패하면 원본 텍스트를 담은 fallback을 반환한다.
+    try:
+        parsed = json.loads(content)
+        return parsed["recommendations"]
+    except (json.JSONDecodeError, KeyError, TypeError):
+        return {"recommendations": [], "raw": content}
 
 
 def classify_genre(title: str, author: str) -> str:
