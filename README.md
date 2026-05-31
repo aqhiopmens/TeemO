@@ -1,4 +1,7 @@
 # TeemO
+
+[![CI](https://github.com/aqhiopmens/TeemO/actions/workflows/ci.yml/badge.svg)](https://github.com/aqhiopmens/TeemO/actions/workflows/ci.yml)
+
 2026-1 Algorithm Project — AI-based Book Preference Analysis & Recommendation
 
 ## Overview
