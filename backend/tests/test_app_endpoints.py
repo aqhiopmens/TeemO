@@ -62,6 +62,19 @@ class BookEndpointsTestCase(unittest.TestCase):
         self.assertEqual(self._add('동명소설', '저자B').status_code, 201)
         self.assertEqual(len(user_books), 2)
 
+    def test_concurrent_duplicate_blocked_by_recheck(self):
+        # Simulate a concurrent request inserting the same book during the slow
+        # classify/cover phase (the race window). The lock-guarded re-check
+        # before append must catch it → 409, and no duplicate is stored.
+        def sneaky_classify(title, author):
+            user_books.append({'title': title, 'author': author,
+                               'genre': '소설', 'rating': 5, 'cover_url': None})
+            return '소설'
+        self.mock_classify.side_effect = sneaky_classify
+        res = self._add('레이스책', '저자')
+        self.assertEqual(res.status_code, 409)
+        self.assertEqual(sum(1 for b in user_books if b['title'] == '레이스책'), 1)
+
     # ── GET stable index (_idx) ─────────────────────────────────
     def test_get_books_includes_idx_field(self):
         self._add('책1', '저자', rating=3)
