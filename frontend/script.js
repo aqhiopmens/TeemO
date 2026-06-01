@@ -373,6 +373,10 @@ document.getElementById('book-form').addEventListener('submit', async (e) => {
   const rating = selectedRating();
   if (!rating) { toast('별점을 먼저 골라주세요', 'warn'); return; }
   const body = { title: document.getElementById('title').value.trim(), author: document.getElementById('author').value.trim(), rating };
+  // Disable the submit button while the request is in flight so a double-click
+  // (or Enter + click) can't fire two POSTs for the same book.
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  if (submitBtn) submitBtn.disabled = true;
   try {
     const res = await apiFetch('/books', { method: 'POST', body: JSON.stringify(body) });
     const saved = res.book || res;  // live backend wraps in { book }; mock returns same shape
@@ -382,6 +386,8 @@ document.getElementById('book-form').addEventListener('submit', async (e) => {
   } catch (err) {
     if (err.message === '이미 등록된 책입니다') toast('이미 책장에 있는 책이에요', 'warn');
     else toast('오류: ' + err.message, 'warn');
+  } finally {
+    if (submitBtn) submitBtn.disabled = false;
   }
 });
 

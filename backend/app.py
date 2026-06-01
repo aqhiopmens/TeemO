@@ -1,3 +1,5 @@
+import threading
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -18,10 +20,24 @@ CORS(app)
 # In-memory book store (keyed by session; single-user for now)
 user_books = []
 
+# Guards the duplicate-check-then-append so concurrent identical POSTs can't
+# both slip through (the dev server is threaded and the cover/genre lookups
+# between the check and the append open a race window).
+_add_lock = threading.Lock()
+
 
 def _normalize(s):
     """Normalize title/author for duplicate detection — case- and space-insensitive."""
     return (s or "").lower().replace(" ", "").strip()
+
+
+def _find_duplicate(title, author):
+    """Return the existing book matching (title, author) by normalized key, or None."""
+    new_key = (_normalize(title), _normalize(author))
+    for existing in user_books:
+        if (_normalize(existing['title']), _normalize(existing['author'])) == new_key:
+            return existing
+    return None
 
 
 @app.route('/api/books', methods=['GET'])
@@ -45,11 +61,10 @@ def add_book():
     if not isinstance(rating, int) or not (1 <= rating <= 5):
         return jsonify({'error': '평점은 1~5 사이의 정수여야 합니다'}), 400
 
-    # Duplicate guard: compare normalized (title, author) tuples.
-    new_key = (_normalize(title), _normalize(author))
-    for existing in user_books:
-        if (_normalize(existing['title']), _normalize(existing['author'])) == new_key:
-            return jsonify({'error': '이미 등록된 책입니다', 'existing': existing}), 409
+    # Fast pre-check: reject obvious duplicates before the slow LLM/cover calls.
+    dup = _find_duplicate(title, author)
+    if dup is not None:
+        return jsonify({'error': '이미 등록된 책입니다', 'existing': dup}), 409
 
     # Genre is no longer entered by the user — Solar classifies it automatically.
     genre = classify_genre(title, author)
@@ -59,7 +74,16 @@ def add_book():
 
     book = {'title': title, 'author': author, 'genre': genre,
             'rating': rating, 'cover_url': cover_url}
-    user_books.append(book)
+
+    # Authoritative check + append under a lock: the slow calls above open a
+    # race window where two concurrent identical POSTs both pass the pre-check.
+    # Re-checking here (atomically with the append) guarantees no duplicates.
+    with _add_lock:
+        dup = _find_duplicate(title, author)
+        if dup is not None:
+            return jsonify({'error': '이미 등록된 책입니다', 'existing': dup}), 409
+        user_books.append(book)
+
     return jsonify({
         'message': '책이 추가되었습니다',
         'book': book,
