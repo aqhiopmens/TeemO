@@ -8,7 +8,7 @@ from algorithms.greedy import greedy_preference_score
 from algorithms.kmp import kmp_search
 from algorithms.levenshtein import levenshtein_distance
 from llm.solar import get_recommendations, classify_genre
-from integrations.google_books import fetch_cover_url
+from integrations.book_covers import fetch_cover_url
 
 load_dotenv()
 

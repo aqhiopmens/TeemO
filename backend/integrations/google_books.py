@@ -25,47 +25,14 @@ Books and correctly falls back to None).
 """
 
 import os
-import re
 
 import requests
+
+from integrations._match import matches
 
 _ENDPOINT = "https://www.googleapis.com/books/v1/volumes"
 _TIMEOUT = 5
 _MAX_RESULTS = 10
-
-
-def _norm(s: str) -> str:
-    """Lowercase and strip whitespace/punctuation for loose comparison."""
-    return re.sub(r"[\s\W_]+", "", (s or "").lower())
-
-
-def _tokens(s: str):
-    """Author name tokens (length >= 2) for cross-spelling overlap checks."""
-    return [t for t in re.split(r"[\s,/.]+", (s or "").lower()) if len(t) >= 2]
-
-
-def _matches(volume_info: dict, title: str, author: str) -> bool:
-    """Whether a Google Books volume is plausibly the requested book.
-
-    Requires the normalized search title to be contained in the volume title
-    AND (if an author was given) at least one author token to overlap in
-    either direction. This keeps precision: same-keyword-but-different books
-    or works *about* the book (different author) are rejected.
-    Time complexity: O(len(title) + len(authors)).
-    """
-    if _norm(title) not in _norm(volume_info.get("title", "")):
-        return False
-    if not author:
-        return True
-    cand_authors = " ".join(volume_info.get("authors", []))
-    cand_norm = _norm(cand_authors)
-    # Our token appears in candidate authors...
-    if any(_norm(t) in cand_norm for t in _tokens(author)):
-        return True
-    # ...or a candidate token appears in our author string (handles spacing/
-    # ordering differences across editions).
-    author_norm = _norm(author)
-    return any(_norm(t) in author_norm for t in _tokens(cand_authors))
 
 
 def _best_cover(query: str, lang_restrict: bool, title: str, author: str):
@@ -103,7 +70,7 @@ def _best_cover(query: str, lang_restrict: bool, title: str, author: str):
         image_links = info.get("imageLinks")
         if not image_links:
             continue
-        if _matches(info, title, author):
+        if matches(info.get("title", ""), info.get("authors", []), title, author):
             return image_links.get("thumbnail")
     return None
 
