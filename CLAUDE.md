@@ -177,7 +177,7 @@ When in doubt, just notify in team chat and proceed.
 | GET | `/api/books` | List books sorted by rating (Merge Sort). Each book includes `_idx` (original `user_books` storage index) so DELETE targets the correct book despite sorting |
 | POST | `/api/books` | Add a book (validates: title/author required, rating 1–5 int). Genre auto-classified by Solar LLM (`classify_genre`); response adds `genre_auto_classified`. Cover looked up via `fetch_cover_url` (Kakao → Google Books fallback) → `cover_url` (None on miss; set `KAKAO_REST_API_KEY` for Korean books + `GOOGLE_BOOKS_API_KEY` for quota) |
 | GET | `/api/search?q=<query>` | KMP exact match, else Levenshtein fuzzy fallback (≤3); returns `{results, matched_by, did_you_mean}` |
-| GET | `/api/recommendations` | Pipeline: Merge Sort → Hashing (top genres) → Greedy (scores) → Solar LLM |
+| GET | `/api/recommendations` | Pipeline: Merge Sort → Hashing (top genres) → Greedy (scores) → Solar LLM. Optional repeated `exclude` params skip already-shown titles (so "다시 추천 받기" returns fresh books; busts the LRU cache per exclude-set) |
 
 ## Current Status (as of Week 11)
 - ✅ All 4 algorithms implemented

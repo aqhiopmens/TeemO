@@ -409,12 +409,19 @@ function scrollToRecs() {
   const y = el.getBoundingClientRect().top + window.scrollY - 16;
   window.scrollTo({ top: y, behavior: 'smooth' });
 }
-async function loadRecs() {
+// Titles already shown this session — sent as `exclude` so "다시 추천 받기"
+// returns fresh books instead of the cached same set. Reset on a fresh run.
+let shownRecTitles = new Set();
+async function loadRecs(opts = {}) {
+  if (opts.reset) shownRecTitles = new Set();
   const recsEl = document.getElementById('recommendations');
   recsEl.className = 'loading'; recsEl.textContent = '추천 고르는 중…';
   scrollToRecs();
   try {
-    const data = await apiFetch('/recommendations');
+    const params = new URLSearchParams();
+    shownRecTitles.forEach(t => params.append('exclude', t));
+    const qs = params.toString();
+    const data = await apiFetch('/recommendations' + (qs ? `?${qs}` : ''));
     recsEl.className = '';
     // The live backend returns { recommendations: [...] } on success, but
     // { recommendations: { error: "..." } } when the LLM call fails (PR #21),
@@ -426,6 +433,8 @@ async function loadRecs() {
         `<button class="btn btn-mini recs-again" id="recs-again">🔄 다시 추천 받기</button>`;
       return;
     }
+    // Accumulate shown titles so the next "다시 추천 받기" excludes them.
+    recs.forEach(r => { if (r && r.title) shownRecTitles.add(r.title); });
     const tags = (data.top_genres || []).map(g => `<span class="tg">${escapeHtml(g)}</span>`).join('');
     const cards = recs.map((r) => {
       const gs = genreStyle(r.genre);
@@ -445,7 +454,7 @@ async function loadRecs() {
       `<button class="btn btn-mini recs-again" id="recs-again">🔄 다시 추천 받기</button>`;
   } catch (e) { recsEl.className = 'error'; recsEl.textContent = '오류: ' + e.message; }
 }
-document.getElementById('get-recs-btn').addEventListener('click', loadRecs);
+document.getElementById('get-recs-btn').addEventListener('click', () => loadRecs({ reset: true }));
 document.getElementById('recommendations').addEventListener('click', (e) => {
   if (e.target.closest('#recs-again')) loadRecs();
 });
