@@ -115,14 +115,26 @@ def get_recommendations(books, top_genres, preference_scores, exclude=None):
                 {"role": "user", "content": prompt},
             ],
             "temperature": 0.7,
-            "max_tokens": 1024,
+            # 5권 사유가 길어도 JSON이 잘리지 않도록 충분히 (이전 1024는 가끔 잘려
+            # 파싱 실패 → "응답 형식 오류"가 났다).
+            "max_tokens": 1500,
         }
 
-        response = requests.post(SOLAR_API_URL, json=payload, headers=headers, timeout=30)
-        response.raise_for_status()
-        content = response.json()["choices"][0]["message"]["content"]
-        parsed = _parse_first_json(content)
-        result = parsed["recommendations"]
+        # Solar가 가끔 비-JSON이거나 잘린 응답을 준다(특히 exclude로 여러 번 호출 시).
+        # 파싱 실패하면 1회 재요청한다 — temperature>0라 재요청은 보통 정상 JSON.
+        parse_error = None
+        result = None
+        for _ in range(2):
+            response = requests.post(SOLAR_API_URL, json=payload, headers=headers, timeout=30)
+            response.raise_for_status()
+            content = response.json()["choices"][0]["message"]["content"]
+            try:
+                result = _parse_first_json(content)["recommendations"]
+                break
+            except (json.JSONDecodeError, KeyError) as e:
+                parse_error = e  # 다음 루프에서 재요청
+        if result is None:
+            raise parse_error  # 두 번 모두 실패 → 바깥 except에서 error dict 반환
 
         # 성공(리스트) 결과만 캐시에 저장. error dict는 저장하지 않는다.
         if isinstance(result, list):

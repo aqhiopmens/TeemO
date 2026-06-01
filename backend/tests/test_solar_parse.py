@@ -53,6 +53,36 @@ class TestRecommendationsTolerantParse(unittest.TestCase):
         self.assertIsInstance(result, list)
         self.assertEqual(len(result), 5)
 
+    @patch("llm.solar.requests.post")
+    def test_retries_once_on_unparseable_then_succeeds(self, mock_post):
+        # First response has no JSON (e.g. truncated / prose); retry returns valid.
+        mock_post.side_effect = [_unparseable_response(), _doubled_recs_response()]
+        result = get_recommendations(
+            [{"title": "데미안", "author": "헤세", "genre": "소설", "rating": 5}],
+            ["소설"], {"소설": 1.0},
+        )
+        self.assertIsInstance(result, list)
+        self.assertEqual(len(result), 5)
+        self.assertEqual(mock_post.call_count, 2)  # one retry
+
+    @patch("llm.solar.requests.post")
+    def test_two_failures_return_error_dict(self, mock_post):
+        mock_post.side_effect = [_unparseable_response(), _unparseable_response()]
+        result = get_recommendations(
+            [{"title": "데미안", "author": "헤세", "genre": "소설", "rating": 5}],
+            ["소설"], {"소설": 1.0},
+        )
+        self.assertEqual(result, {"error": "응답 형식 오류"})
+        self.assertEqual(mock_post.call_count, 2)
+
+
+def _unparseable_response():
+    """A Solar response whose content has no JSON object at all."""
+    resp = MagicMock()
+    resp.json.return_value = {"choices": [{"message": {"content": "죄송, 추천을 못 만들었어요"}}]}
+    resp.raise_for_status.return_value = None
+    return resp
+
 
 if __name__ == "__main__":
     unittest.main()
