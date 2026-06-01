@@ -5,15 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TeemO</title>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="app">
-    <div class="topbar">
-      <div class="brand-name">Teem<span class="o">O</span></div>
+    <header class="topbar">
+      <div class="brand-block">
+        <div class="brand-text">
+          <div class="brand-name">Teem<span class="o">O</span></div>
+          <div class="brand-tag">AI가 분석하는 나만의 독서 취향</div>
+        </div>
+      </div>
+      <div class="masthead-date" id="masthead-date">
+        <span class="md-orn" aria-hidden="true">❦</span>
+        <div class="md-stack">
+          <span class="md-label">오늘의 서재</span>
+          <span class="md-date" id="md-date"></span>
+        </div>
+        <span class="md-orn" aria-hidden="true">❦</span>
+      </div>
       <div class="avatar">나</div>
-    </div>
-    <p class="page-sub">AI가 분석하는 나만의 독서 취향</p>
+    </header>
+    <div class="masthead-rule" aria-hidden="true"></div>
 
     <!-- 통계 -->
     <section class="stats-row pop" id="stats-dashboard" aria-label="독서 통계">
@@ -63,7 +79,12 @@
           </div>
           <div id="search-results"></div>
         </section>
-        <button id="get-recs-btn" class="btn btn-primary btn-block rec-cta"><span class="spk">✨</span> AI 추천 받기</button>
+
+        <section class="card quote-card" id="quote-card" title="다른 문장 보기">
+          <span class="quote-mark" aria-hidden="true">“</span>
+          <p class="quote-text" id="quote-text"></p>
+          <div class="quote-foot"><span class="quote-orn">—</span> 오늘의 문장</div>
+        </section>
       </div>
 
       <!-- 우: 표시 영역 -->
@@ -88,8 +109,8 @@
         </section>
 
         <section class="card" id="recommendations-section">
-          <div class="card-head"><span class="card-title">오늘의 추천</span></div>
-          <div id="recommendations"><p class="rec-hint">왼쪽 ‘AI 추천 받기’를 누르면 취향을 분석해 책을 골라드려요.</p></div>
+          <div class="card-head"><span class="card-title">오늘의 추천</span><button id="get-recs-btn" class="btn rec-trigger"><span class="spk">✨</span> 추천 받기</button></div>
+          <div id="recommendations"><p class="rec-hint">오른쪽 ‘추천 받기’를 누르면 지금까지의 책장을 바탕으로 취향을 분석해 다섯 권을 골라드려요.</p></div>
         </section>
       </div>
     </div>

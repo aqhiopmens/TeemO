@@ -99,13 +99,20 @@ const MOCK = {
     }
 
     if (route === '/search' && method === 'GET') {
-      const q = decodeURIComponent((query || '').replace(/^q=/, '')).trim();
-      const exact = this.books.filter(b => b.title.toLowerCase().includes(q.toLowerCase()));
+      const q = decodeURIComponent((query || '').replace(/^q=/, '')).trim().toLowerCase();
+      // Mock searches title OR author, mirroring the live backend.
+      const exact = this.books.filter(b =>
+        b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q));
       if (exact.length) return { results: exact, matched_by: 'exact', did_you_mean: null };
-      let best = null, bestD = Infinity;
-      for (const b of this.books) { const d = levenshtein(q, b.title); if (d < bestD) { bestD = d; best = b; } }
-      if (best && bestD <= Math.max(2, Math.ceil(best.title.length * 0.5)))
-        return { results: [best], matched_by: 'fuzzy', did_you_mean: best.title };
+      let best = null, bestD = Infinity, bestStr = null;
+      for (const b of this.books) {
+        for (const field of [b.title, b.author]) {
+          const d = levenshtein(q, field.toLowerCase());
+          if (d < bestD) { bestD = d; best = b; bestStr = field; }
+        }
+      }
+      if (best && bestD <= 3)
+        return { results: [best], matched_by: 'fuzzy', did_you_mean: bestStr };
       return { results: [], matched_by: 'none', did_you_mean: null };
     }
 
@@ -155,9 +162,8 @@ function genreStyle(genre) {
   return { cover: `oklch(0.64 0.13 ${h})`, chipBg: `oklch(0.95 0.035 ${h})`, chipFg: `oklch(0.45 0.11 ${h})` };
 }
 
-/* ── Per-book cover colour — hashed so all spines differ
-   (wide hue range + mixed pastel / medium lightness & chroma).
-   Used as the fallback when a book has no Google Books cover. ── */
+/* ── Per-book cover colour — hashed so spines differ. Used as the
+   fallback when a book has no Kakao/Google Books cover. ── */
 function hashStr(s) { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return Math.abs(h); }
 function coverColor(book) {
   const h = hashStr(book.title + '·' + book.author);
@@ -172,8 +178,7 @@ function renderBookCard(book, index) {
   const del = (typeof index === 'number')
     ? `<button class="del-btn" data-index="${index}" aria-label="삭제"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></button>`
     : '';
-  // Google Books cover (cover_url) overlays the colour block. If the image
-  // fails to load, onerror removes it and the colour block shows through.
+  // Real cover overlays the colour block; on load failure it removes itself.
   const coverImg = book.cover_url
     ? `<img class="cover-img" src="${escapeHtml(book.cover_url)}" alt="" loading="lazy" onerror="this.remove()">`
     : '';
@@ -334,9 +339,8 @@ document.getElementById('book-scroll').addEventListener('click', async (e) => {
 async function loadBooks(opts = {}) {
   try {
     const books = await apiFetch('/books');
-    // Prefer the backend's _idx (original storage index) so deletes hit the
-    // right book even though GET returns a rating-sorted list. Fall back to
-    // the array position only if the backend didn't supply it (e.g. mock).
+    // Prefer the backend's _idx (storage index) so deletes hit the right book
+    // even though GET returns a rating-sorted list; fall back to array position.
     ALL = books.map((b, i) => ({ ...b, _idx: b._idx ?? i }));
     updateStats(books);
     buildFilterChips();
@@ -373,13 +377,12 @@ document.getElementById('book-form').addEventListener('submit', async (e) => {
   const rating = selectedRating();
   if (!rating) { toast('별점을 먼저 골라주세요', 'warn'); return; }
   const body = { title: document.getElementById('title').value.trim(), author: document.getElementById('author').value.trim(), rating };
-  // Disable the submit button while the request is in flight so a double-click
-  // (or Enter + click) can't fire two POSTs for the same book.
+  // Disable submit while in flight so a double-click can't POST the same book twice.
   const submitBtn = e.target.querySelector('button[type="submit"]');
   if (submitBtn) submitBtn.disabled = true;
   try {
     const res = await apiFetch('/books', { method: 'POST', body: JSON.stringify(body) });
-    const saved = res.book || res;  // live backend wraps in { book }; mock returns same shape
+    const saved = res.book || res;  // live backend wraps in { book }; mock matches
     e.target.reset(); resetStarPicker();
     await loadBooks({ reset: true });
     toast(`${saved.genre} · '${saved.title}' 추가 완료`);
@@ -429,9 +432,9 @@ async function loadRecs(opts = {}) {
     const qs = params.toString();
     const data = await apiFetch('/recommendations' + (qs ? `?${qs}` : ''));
     recsEl.className = '';
-    // The live backend returns { recommendations: [...] } on success, but
-    // { recommendations: { error: "..." } } when the LLM call fails (PR #21),
-    // and a top-level { error } for empty libraries (surfaced via apiFetch throw).
+    // Live backend returns { recommendations: [...] } on success, but
+    // { recommendations: { error } } on LLM failure, and a top-level { error }
+    // for empty libraries (surfaced via apiFetch throw).
     const recs = data.recommendations;
     if (data.error || !Array.isArray(recs)) {
       const msg = data.error || (recs && recs.error) || '추천을 받지 못했어요. 잠시 후 다시 시도해주세요.';
@@ -439,7 +442,6 @@ async function loadRecs(opts = {}) {
         `<button class="btn btn-mini recs-again" id="recs-again">🔄 다시 추천 받기</button>`;
       return;
     }
-    // Accumulate shown titles so the next "다시 추천 받기" excludes them.
     recs.forEach(r => { if (r && r.title) shownRecTitles.add(r.title); });
     const tags = (data.top_genres || []).map(g => `<span class="tg">${escapeHtml(g)}</span>`).join('');
     const cards = recs.map((r) => {
@@ -464,5 +466,36 @@ document.getElementById('get-recs-btn').addEventListener('click', () => loadRecs
 document.getElementById('recommendations').addEventListener('click', (e) => {
   if (e.target.closest('#recs-again')) loadRecs();
 });
+
+/* ── 오늘의 서재 (masthead dateline) ── */
+(function initDate() {
+  const el = document.getElementById('md-date');
+  if (!el) return;
+  const d = new Date();
+  const days = ['일', '월', '화', '수', '목', '금', '토'];
+  el.textContent = `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 (${days[d.getDay()]})`;
+})();
+
+/* ── 오늘의 문장 (cozy reading notes — rotates on load & click) ── */
+const QUOTES = [
+  '좋은 책 한 권은 다 읽고 나서도 한참을 곁에 머문다.',
+  '오늘 넘긴 한 페이지가 내일의 나를 조금 바꿔놓는다.',
+  '책장은 천천히 쌓일수록 더 단단해진다.',
+  '어떤 밤은 책 한 권으로 충분히 따뜻하다.',
+  '읽는 사람에게는 언제나 갈 수 있는 곳이 많다.',
+  '한 권을 덮으면 다음 한 권이 기다리고 있다.',
+];
+(function initQuote() {
+  const card = document.getElementById('quote-card');
+  const textEl = document.getElementById('quote-text');
+  if (!card || !textEl) return;
+  let i = Math.floor(Math.random() * QUOTES.length);
+  const paint = () => { textEl.textContent = QUOTES[i]; };
+  paint();
+  card.addEventListener('click', () => {
+    textEl.style.opacity = '0';
+    setTimeout(() => { i = (i + 1) % QUOTES.length; paint(); textEl.style.opacity = '1'; }, 200);
+  });
+})();
 
 loadBooks();
