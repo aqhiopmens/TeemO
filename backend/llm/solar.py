@@ -83,7 +83,7 @@ def get_recommendations(books, top_genres, preference_scores, exclude=None):
             exclude_clause = (
                 f"\n\n단, 다음 책들은 이미 추천했으니 절대 다시 추천하지 마: "
                 f"{', '.join(exclude_titles)}.\n"
-                "이 목록과 겹치지 않는 완전히 새로운 책 5권으로 추천해줘."
+                "이 목록과 겹치지 않는 완전히 새로운 책 4권으로 추천해줘."
             )
 
         # Prompt v2 + JSON 구조화: 한국어 친근체 + 추천 사유 2~3문장
@@ -93,12 +93,12 @@ def get_recommendations(books, top_genres, preference_scores, exclude=None):
             f"내가 지금까지 읽고 평점을 매긴 책들이야:\n{book_list}\n\n"
             f"내가 가장 좋아하는 장르: {genre_str}\n"
             f"장르별 선호 점수: {score_str}\n\n"
-            "이 독서 이력과 취향을 바탕으로, 내가 다음에 읽으면 좋아할 책 5권을 추천해줘.\n"
+            "이 독서 이력과 취향을 바탕으로, 내가 다음에 읽으면 좋아할 책 4권을 추천해줘.\n"
             "각 책마다 제목, 저자, 장르를 알려주고, 왜 내 취향에 맞는지 추천 사유를 "
             "2~3문장으로 친근하게 설명해줘."
             f"{exclude_clause}\n\n"
             "응답은 정확히 다음 JSON 형식으로만 해줘 — 다른 텍스트, 설명, 코드펜스, 마크다운 절대 금지. "
-            "배열에는 정확히 5개 책:\n"
+            "배열에는 정확히 4개 책:\n"
             '{"recommendations": [{"title": "책제목", "author": "저자", '
             '"genre": "장르", "reason": "추천사유"}, ...]}\n\n'
             f"{_NO_MARKDOWN}"
@@ -115,7 +115,7 @@ def get_recommendations(books, top_genres, preference_scores, exclude=None):
                 {"role": "user", "content": prompt},
             ],
             "temperature": 0.7,
-            # 5권 사유가 길어도 JSON이 잘리지 않도록 충분히 (이전 1024는 가끔 잘려
+            # 추천 사유가 길어도 JSON이 잘리지 않도록 충분히 (이전 1024는 가끔 잘려
             # 파싱 실패 → "응답 형식 오류"가 났다).
             "max_tokens": 1500,
         }
