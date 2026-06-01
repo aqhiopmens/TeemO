@@ -62,7 +62,10 @@ TeemO/
 │   ├── llm/
 │   │   └── solar.py            # Upstage Solar API client
 │   ├── integrations/
-│   │   └── google_books.py    # Best-effort cover lookup (fetch_cover_url) — None on quota/miss
+│   │   ├── book_covers.py     # Unified fetch_cover_url — Kakao → Google Books fallback
+│   │   ├── kakao_books.py     # Kakao Book Search (best Korean coverage)
+│   │   ├── google_books.py    # Google Books (international/classics; progressive query)
+│   │   └── _match.py          # Shared title/author precision check
 │   └── requirements.txt
 ├── frontend/
 │   ├── index.html              # 4 sections: add / search / list / recommendations
@@ -172,7 +175,7 @@ When in doubt, just notify in team chat and proceed.
 | Method | Path | Purpose |
 |---|---|---|
 | GET | `/api/books` | List books sorted by rating (Merge Sort). Each book includes `_idx` (original `user_books` storage index) so DELETE targets the correct book despite sorting |
-| POST | `/api/books` | Add a book (validates: title/author required, rating 1–5 int). Genre auto-classified by Solar LLM (`classify_genre`); response adds `genre_auto_classified`. Cover looked up via Google Books (`fetch_cover_url`) → `cover_url` (None on miss/quota; set `GOOGLE_BOOKS_API_KEY` for reliable quota) |
+| POST | `/api/books` | Add a book (validates: title/author required, rating 1–5 int). Genre auto-classified by Solar LLM (`classify_genre`); response adds `genre_auto_classified`. Cover looked up via `fetch_cover_url` (Kakao → Google Books fallback) → `cover_url` (None on miss; set `KAKAO_REST_API_KEY` for Korean books + `GOOGLE_BOOKS_API_KEY` for quota) |
 | GET | `/api/search?q=<query>` | KMP exact match, else Levenshtein fuzzy fallback (≤3); returns `{results, matched_by, did_you_mean}` |
 | GET | `/api/recommendations` | Pipeline: Merge Sort → Hashing (top genres) → Greedy (scores) → Solar LLM |
 
