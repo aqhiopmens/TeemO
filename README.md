@@ -80,7 +80,7 @@ python -m unittest discover -s tests
 |--------|------|-------------|
 | GET | `/api/books` | List all books sorted by rating. Each book carries `_idx` (its original storage index) so the client can delete the right book despite the sorted order |
 | POST | `/api/books` | Add a book `{title, author, rating}` — genre is auto-classified by the Solar LLM (response adds `genre_auto_classified: true`). A best-effort cover image is looked up via Kakao (Korean books) then Google Books, returned as `cover_url` (`null` if not found) |
-| GET | `/api/search?q=<query>` | Search titles — KMP exact match, else Levenshtein fuzzy fallback (≤3). Returns `{results, matched_by, did_you_mean}` |
+| GET | `/api/search?q=<query>` | Search **title or author** — KMP exact substring match, else Levenshtein fuzzy fallback (≤3, min distance over title/author). Returns `{results, matched_by, did_you_mean}` |
 | GET | `/api/recommendations` | Get Solar LLM recommendations. Optional repeated `exclude` params (`?exclude=A&exclude=B`) skip already-shown titles so "다시 추천 받기" returns fresh books |
 
 ## Algorithm Concepts Applied

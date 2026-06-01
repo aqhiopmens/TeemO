@@ -106,23 +106,33 @@ FUZZY_DISTANCE_THRESHOLD = 3
 def search_books():
     query = (request.args.get('q') or '').strip().lower()
 
-    # Stage 1: exact substring match via KMP.
-    exact = [b for b in user_books if kmp_search(b['title'].lower(), query) != -1]
+    # Stage 1: exact substring match via KMP — on title OR author.
+    exact = [
+        b for b in user_books
+        if kmp_search(b['title'].lower(), query) != -1
+        or kmp_search(b['author'].lower(), query) != -1
+    ]
     if exact:
         return jsonify({'results': exact, 'matched_by': 'exact', 'did_you_mean': None})
 
-    # Stage 2: fuzzy fallback — Levenshtein distance against every title,
-    # keeping those within the threshold, closest first.
-    scored = [(levenshtein_distance(query, b['title'].lower()), b) for b in user_books]
+    # Stage 2: fuzzy fallback — Levenshtein distance against each book's title
+    # AND author; keep the smaller distance per book, within threshold, closest
+    # first. `did_you_mean` is the closest-matching field (title or author).
+    scored = []
+    for b in user_books:
+        dt = levenshtein_distance(query, b['title'].lower())
+        da = levenshtein_distance(query, b['author'].lower())
+        best_str = b['title'] if dt <= da else b['author']
+        scored.append((min(dt, da), best_str, b))
     near = sorted(
-        (pair for pair in scored if pair[0] <= FUZZY_DISTANCE_THRESHOLD),
-        key=lambda pair: pair[0],
+        (item for item in scored if item[0] <= FUZZY_DISTANCE_THRESHOLD),
+        key=lambda item: item[0],
     )
     if near:
         return jsonify({
-            'results': [b for _, b in near],
+            'results': [b for _, _, b in near],
             'matched_by': 'fuzzy',
-            'did_you_mean': near[0][1]['title'],
+            'did_you_mean': near[0][1],
         })
 
     return jsonify({'results': [], 'matched_by': 'none', 'did_you_mean': None})

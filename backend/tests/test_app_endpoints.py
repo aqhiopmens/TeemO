@@ -123,6 +123,28 @@ class BookEndpointsTestCase(unittest.TestCase):
         self.assertNotIn('이미본책', titles)
         self.assertIn('새책', titles)
 
+    # ── Search by title / author ────────────────────────────────
+    def _search(self, q):
+        return self.client.get('/api/search', query_string={'q': q}).get_json()
+
+    def test_search_by_author_exact(self):
+        self._add('동물농장', '조지 오웰')
+        data = self._search('오웰')           # author substring, not in title
+        self.assertEqual(data['matched_by'], 'exact')
+        self.assertEqual(data['results'][0]['author'], '조지 오웰')
+
+    def test_search_by_title_still_exact(self):
+        self._add('동물농장', '조지 오웰')
+        data = self._search('동물')
+        self.assertEqual(data['matched_by'], 'exact')
+        self.assertEqual(data['results'][0]['title'], '동물농장')
+
+    def test_search_fuzzy_author_suggests_author(self):
+        self._add('동물농장', '조지 오웰')
+        data = self._search('조지 오엘')       # 1-edit typo in author
+        self.assertEqual(data['matched_by'], 'fuzzy')
+        self.assertEqual(data['did_you_mean'], '조지 오웰')
+
     # ── Delete ──────────────────────────────────────────────────
     def test_delete_existing_book_returns_200(self):
         self._add('지울책', '저자')
