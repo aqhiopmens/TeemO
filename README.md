@@ -19,16 +19,15 @@ LLM to recommend four books with reasons.
 
 ## Demo
 
-📹 **Demo video:** _여기에 업로드한 데모 영상 링크를 넣어주세요_ (e.g. `https://youtu.be/...`)
+📹 **[▶ Watch the demo on YouTube](https://youtu.be/DPBXUzClvoU)**
+
+<a href="https://youtu.be/DPBXUzClvoU"><img src="https://img.youtube.com/vi/DPBXUzClvoU/hqdefault.jpg" width="440" alt="TeemO demo video"></a>
 
 | 책장 + 통계 대시보드 | AI 추천 (4권) |
 |:--:|:--:|
 | ![Shelf](docs/screenshots/shelf.png) | ![Recommendations](docs/screenshots/recommendations.png) |
 | **검색 — 제목·저자 + 오타 교정** | **책 추가 — 자동 장르·표지** |
 | ![Search](docs/screenshots/search.png) | ![Add a book](docs/screenshots/add.png) |
-
-> 위 이미지는 `docs/screenshots/`에 `shelf.png · recommendations.png · search.png · add.png`
-> 4장을 넣으면 표시됩니다 (실행 화면 캡처 또는 데모 영상 프레임).
 
 ---
 
