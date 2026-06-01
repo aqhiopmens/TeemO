@@ -29,8 +29,9 @@ import sys
 
 import requests
 
-# Curated pool of recognizable titles (good Google Books cover hit-rate) across
-# diverse genres so a random subset still yields varied genres + recommendations.
+# Curated pool (~50) of recognizable titles across diverse genres. All were
+# verified to resolve a cover via the Kakao→Google lookup, so any random subset
+# shows covers while still yielding varied genres + good recommendations.
 BOOK_POOL = [
     # 소설
     ("채식주의자", "한강"),
@@ -51,12 +52,16 @@ BOOK_POOL = [
     ("82년생 김지영", "조남주"),
     ("불편한 편의점", "김호연"),
     ("아몬드", "손원평"),
+    ("토지", "박경리"),
+    ("이방인", "알베르 카뮈"),
+    ("달러구트 꿈 백화점", "이미예"),
     # SF
     ("1984", "조지 오웰"),
     ("듄", "프랭크 허버트"),
     ("멋진 신세계", "올더스 헉슬리"),
     ("우리가 빛의 속도로 갈 수 없다면", "김초엽"),
     ("삼체", "류츠신"),
+    ("파운데이션", "아이작 아시모프"),
     # 판타지
     ("해리 포터와 마법사의 돌", "J.K. 롤링"),
     ("반지의 제왕", "J.R.R. 톨킨"),
@@ -74,6 +79,7 @@ BOOK_POOL = [
     ("총, 균, 쇠", "재레드 다이아몬드"),
     ("정의란 무엇인가", "마이클 샌델"),
     ("군주론", "마키아벨리"),
+    ("죽음의 수용소에서", "빅터 프랭클"),
     # 과학
     ("코스모스", "칼 세이건"),
     ("이기적 유전자", "리처드 도킨스"),
@@ -84,6 +90,7 @@ BOOK_POOL = [
     ("아주 작은 습관의 힘", "제임스 클리어"),
     # 역사
     ("로마인 이야기 1", "시오노 나나미"),
+    ("칼의 노래", "김훈"),
 ]
 
 # Rating value → selection weight (%). Skews high, like real "books I rated".
