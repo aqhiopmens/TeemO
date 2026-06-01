@@ -50,6 +50,26 @@ class TestRecommendationCache(unittest.TestCase):
         self.assertEqual(mock_post.call_count, 2)
 
     @patch("llm.solar.requests.post")
+    def test_exclude_busts_cache_and_calls_api_again(self, mock_post):
+        mock_post.return_value = _rec_response()
+        books = _books()
+        # 같은 책이라도 exclude가 다르면 다른 캐시 키 → API 재호출 ("다시 추천").
+        get_recommendations(books, ["소설"], {"소설": 1.0})
+        get_recommendations(books, ["소설"], {"소설": 1.0}, exclude=["추천0", "추천1"])
+        self.assertEqual(mock_post.call_count, 2)
+        # 같은 exclude로 다시 부르면 캐시 히트 → 추가 호출 없음.
+        get_recommendations(books, ["소설"], {"소설": 1.0}, exclude=["추천1", "추천0"])
+        self.assertEqual(mock_post.call_count, 2)
+
+    @patch("llm.solar.requests.post")
+    def test_excluded_titles_appear_in_prompt(self, mock_post):
+        mock_post.return_value = _rec_response()
+        get_recommendations(_books(), ["소설"], {"소설": 1.0}, exclude=["멋진 신세계"])
+        prompt = mock_post.call_args.kwargs["json"]["messages"][1]["content"]
+        self.assertIn("멋진 신세계", prompt)
+        self.assertIn("이미 추천", prompt)
+
+    @patch("llm.solar.requests.post")
     def test_error_result_not_cached(self, mock_post):
         import requests
         mock_post.side_effect = requests.ConnectionError()

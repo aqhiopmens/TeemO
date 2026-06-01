@@ -22,17 +22,26 @@ GENRE_CANDIDATES = [
 _NO_MARKDOWN = "마크다운(**, #, `, -) 사용 금지, 평문으로만 응답."
 
 
-def get_recommendations(books, top_genres, preference_scores):
+def get_recommendations(books, top_genres, preference_scores, exclude=None):
     """Solar에 추천을 요청하고 recommendations 리스트를 반환한다.
+
+    ``exclude``: 이미 추천해 제외할 책 제목들(iterable). "다시 추천 받기"가
+    매번 새로운 책을 받도록, 제외 목록을 프롬프트에 반영하고 캐시 키에도
+    포함한다(같은 제외셋끼리만 캐시 공유).
 
     모든 실패는 예외로 전파하지 않고 ``{"error": <한국어 메시지>}`` dict로
     돌려준다 — 호출부(app.py)와 프론트가 항상 dict/list만 다루면 되도록.
     """
     try:
-        # 캐시 키: 책의 (제목, 저자, 평점) 집합 — 순서 무관(sorted).
-        cache_key = hash(tuple(sorted(
-            (b["title"], b["author"], b["rating"]) for b in books
-        )))
+        # 제외 목록 정규화: 공백 제거 + 중복 제거 + 정렬(캐시 키 안정화).
+        exclude_titles = tuple(sorted(
+            {(t or "").strip() for t in (exclude or []) if (t or "").strip()}
+        ))
+        # 캐시 키: 책의 (제목, 저자, 평점) 집합 + 제외 목록 — 순서 무관(sorted).
+        cache_key = hash((
+            tuple(sorted((b["title"], b["author"], b["rating"]) for b in books)),
+            exclude_titles,
+        ))
         if cache_key in _cache:
             _cache.move_to_end(cache_key)  # 최근 사용으로 갱신 (LRU)
             return _cache[cache_key]
@@ -48,6 +57,15 @@ def get_recommendations(books, top_genres, preference_scores):
         genre_str = ", ".join(top_genres) if top_genres else "다양함"
         score_str = ", ".join(f"{g}: {s}" for g, s in preference_scores.items())
 
+        # "다시 추천 받기"용 제외 절: 이미 보여준 책을 다시 추천하지 않도록.
+        exclude_clause = ""
+        if exclude_titles:
+            exclude_clause = (
+                f"\n\n단, 다음 책들은 이미 추천했으니 절대 다시 추천하지 마: "
+                f"{', '.join(exclude_titles)}.\n"
+                "이 목록과 겹치지 않는 완전히 새로운 책 5권으로 추천해줘."
+            )
+
         # Prompt v2 + JSON 구조화: 한국어 친근체 + 추천 사유 2~3문장
         # + 응답을 JSON 형식으로 강제 (프론트 카드 UI 렌더용)
         prompt = (
@@ -57,7 +75,8 @@ def get_recommendations(books, top_genres, preference_scores):
             f"장르별 선호 점수: {score_str}\n\n"
             "이 독서 이력과 취향을 바탕으로, 내가 다음에 읽으면 좋아할 책 5권을 추천해줘.\n"
             "각 책마다 제목, 저자, 장르를 알려주고, 왜 내 취향에 맞는지 추천 사유를 "
-            "2~3문장으로 친근하게 설명해줘.\n\n"
+            "2~3문장으로 친근하게 설명해줘."
+            f"{exclude_clause}\n\n"
             "응답은 정확히 다음 JSON 형식으로만 해줘 — 다른 텍스트, 설명, 코드펜스, 마크다운 절대 금지. "
             "배열에는 정확히 5개 책:\n"
             '{"recommendations": [{"title": "책제목", "author": "저자", '

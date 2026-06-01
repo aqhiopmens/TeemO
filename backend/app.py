@@ -118,7 +118,11 @@ def recommendations():
     top_genres = hash_table.get_top_genres(3)
     preference_scores = greedy_preference_score(sorted_books)
 
-    recs = get_recommendations(sorted_books, top_genres, preference_scores)
+    # "다시 추천 받기": already-shown titles to avoid. Repeated query params
+    # (?exclude=A&exclude=B) so titles containing commas stay intact.
+    exclude = request.args.getlist('exclude')
+
+    recs = get_recommendations(sorted_books, top_genres, preference_scores, exclude=exclude)
     return jsonify({'recommendations': recs, 'top_genres': top_genres})
 
 
