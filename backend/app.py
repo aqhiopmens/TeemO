@@ -118,6 +118,10 @@ def search_books():
     # Stage 2: fuzzy fallback — Levenshtein distance against each book's title
     # AND author; keep the smaller distance per book, within threshold, closest
     # first. `did_you_mean` is the closest-matching field (title or author).
+    # Length-aware tolerance: ~1 edit per 3 query chars, capped at
+    # FUZZY_DISTANCE_THRESHOLD. This stops a short typo (e.g. "데미얀", 3 chars)
+    # from also matching unrelated short titles/authors (e.g. "한강", distance 3).
+    tolerance = max(1, min(FUZZY_DISTANCE_THRESHOLD, round(len(query) / 3)))
     scored = []
     for b in user_books:
         dt = levenshtein_distance(query, b['title'].lower())
@@ -125,7 +129,7 @@ def search_books():
         best_str = b['title'] if dt <= da else b['author']
         scored.append((min(dt, da), best_str, b))
     near = sorted(
-        (item for item in scored if item[0] <= FUZZY_DISTANCE_THRESHOLD),
+        (item for item in scored if item[0] <= tolerance),
         key=lambda item: item[0],
     )
     if near:
