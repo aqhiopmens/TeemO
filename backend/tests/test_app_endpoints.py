@@ -96,6 +96,20 @@ class BookEndpointsTestCase(unittest.TestCase):
         remaining = [b['title'] for b in user_books]
         self.assertEqual(remaining, ['낮은별점'])
 
+    # ── Recommendations exclude filter ──────────────────────────
+    def test_recommendations_filters_excluded_titles(self):
+        self._add('어떤책', '저자', rating=5)
+        fake = [
+            {'title': '이미본책', 'author': 'A', 'genre': '소설', 'reason': 'r'},
+            {'title': '새책', 'author': 'B', 'genre': '소설', 'reason': 'r'},
+        ]
+        with patch('app.get_recommendations', return_value=fake):
+            res = self.client.get('/api/recommendations?exclude=이미본책')
+        self.assertEqual(res.status_code, 200)
+        titles = [r['title'] for r in res.get_json()['recommendations']]
+        self.assertNotIn('이미본책', titles)
+        self.assertIn('새책', titles)
+
     # ── Delete ──────────────────────────────────────────────────
     def test_delete_existing_book_returns_200(self):
         self._add('지울책', '저자')

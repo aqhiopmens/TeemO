@@ -22,6 +22,26 @@ GENRE_CANDIDATES = [
 _NO_MARKDOWN = "마크다운(**, #, `, -) 사용 금지, 평문으로만 응답."
 
 
+def _parse_first_json(content):
+    """응답에서 첫 JSON 객체만 파싱한다.
+
+    Solar가 가끔 코드펜스를 두르거나, 유효한 JSON 뒤에 설명/중복 객체를
+    덧붙여 ``json.loads`` 가 'Extra data' 로 실패하는 경우가 있다(특히 exclude
+    프롬프트). 코드펜스를 벗기고 첫 '{' 부터 ``raw_decode`` 로 한 객체만 읽어
+    뒤의 여분은 무시한다. 파싱 불가 시 JSONDecodeError 를 그대로 올린다.
+    """
+    text = content.strip()
+    if text.startswith("```"):
+        text = text.strip("`")
+        if text[:4].lower() == "json":
+            text = text[4:]
+    start = text.find("{")
+    if start == -1:
+        raise json.JSONDecodeError("no JSON object found", text or "", 0)
+    obj, _ = json.JSONDecoder().raw_decode(text[start:])
+    return obj
+
+
 def get_recommendations(books, top_genres, preference_scores, exclude=None):
     """Solar에 추천을 요청하고 recommendations 리스트를 반환한다.
 
@@ -101,7 +121,7 @@ def get_recommendations(books, top_genres, preference_scores, exclude=None):
         response = requests.post(SOLAR_API_URL, json=payload, headers=headers, timeout=30)
         response.raise_for_status()
         content = response.json()["choices"][0]["message"]["content"]
-        parsed = json.loads(content)
+        parsed = _parse_first_json(content)
         result = parsed["recommendations"]
 
         # 성공(리스트) 결과만 캐시에 저장. error dict는 저장하지 않는다.
