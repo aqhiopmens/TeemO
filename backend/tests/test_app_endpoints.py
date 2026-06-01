@@ -145,6 +145,18 @@ class BookEndpointsTestCase(unittest.TestCase):
         self.assertEqual(data['matched_by'], 'fuzzy')
         self.assertEqual(data['did_you_mean'], '조지 오웰')
 
+    def test_search_short_typo_excludes_unrelated(self):
+        # A short typo must not drag in unrelated short titles/authors:
+        # "데미얀" (3 chars) is edit-distance 1 from "데미안" but 3 from "한강".
+        self._add('데미안', '헤르만 헤세')
+        self._add('채식주의자', '한강')
+        data = self._search('데미얀')
+        self.assertEqual(data['matched_by'], 'fuzzy')
+        self.assertEqual(data['did_you_mean'], '데미안')
+        titles = [b['title'] for b in data['results']]
+        self.assertIn('데미안', titles)
+        self.assertNotIn('채식주의자', titles)   # 한강 (distance 3) excluded
+
     # ── Delete ──────────────────────────────────────────────────
     def test_delete_existing_book_returns_200(self):
         self._add('지울책', '저자')
