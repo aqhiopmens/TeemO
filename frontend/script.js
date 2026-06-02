@@ -244,7 +244,7 @@ function filteredSorted() {
   if (activeGenres.size) arr = arr.filter(b => activeGenres.has(b.genre));
   if (sortKey === 'rating') arr.sort((a, b) => b.rating - a.rating || a._idx - b._idx);
   else if (sortKey === 'title') arr.sort((a, b) => a.title.localeCompare(b.title, 'ko'));
-  else arr.sort((a, b) => a._idx - b._idx); // recent: canonical front = newest
+  else arr.sort((a, b) => b._idx - a._idx); // recent: newest first (largest _idx)
   return arr;
 }
 
